@@ -32,3 +32,4 @@ two_caps = df[df["two"] == 2]
 top_scorer = two_caps.sort_values(by="Goals", ascending=False).iloc[0]
 # two_caps를 내림차순으로 정렬해서 맨 위 값을 뽑아 냄 (2번 출전하고, Goals가 제일 높은 행)
 print(top_scorer)
+
