@@ -1,0 +1,17 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+
+scalar_cm = tf.constant(183)
+scalar_kg = tf.constant(89)
+scalar_bmi = tf.constant(26.58)
+
+print(scalar_cm)
+print(scalar_kg)
+print(scalar_bmi)
+
+scalar_numpy = scalar_cm.numpy()
+
+print(scalar_numpy)
+type(scalar_numpy)

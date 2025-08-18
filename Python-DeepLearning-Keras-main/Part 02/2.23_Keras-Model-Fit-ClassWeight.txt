@@ -1,0 +1,123 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+from tensorflow.keras import datasets
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Flatten, Dense
+
+mnist = datasets.mnist
+(x_train, y_train),(x_test, y_test) = mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+
+model = Sequential([
+  Flatten(input_shape=(28,28)),
+  Dense(32, activation='relu'),
+  Dense(16, activation='relu'),
+  Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+import pandas as pd
+
+pd.DataFrame(y_train).value_counts()
+
+weight = {
+    0: 1.0,
+    1: 1.0,
+    2: 1.0,
+    3: 1.0,
+    4: 1.0,
+    5: 1.2,
+    6: 1.0,
+    7: 1.0,
+    8: 1.0,
+    9: 1.0,
+}
+
+model.fit(x_train, y_train, 
+          class_weight=weight, 
+          batch_size=32, 
+          epochs=5)
+
+import numpy as np
+
+weight = np.ones(shape=(len(y_train),))
+weight[y_train == 5] = 1.2
+
+print('sample_weight shape:', weight.shape)
+
+model.fit(x_train, y_train, 
+          sample_weight = weight, 
+          batch_size=32, 
+          epochs=5)
+
+from tensorflow.keras import datasets
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Flatten, Dense
+
+mnist = datasets.mnist
+(x_train, y_train),(x_test, y_test) = mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+
+model = Sequential([
+  Flatten(input_shape=(28,28)),
+  Dense(32, activation='relu'),
+  Dense(16, activation='relu'),
+  Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+from tensorflow.keras.callbacks import EarlyStopping
+
+callback_EarlyStopping = EarlyStopping(monitor='val_loss', patience=5, verbose=1)
+
+history = model.fit(x_train, y_train,
+                    validation_split=0.2,
+                    epochs=20, batch_size=1,
+                    callbacks=callback_EarlyStopping,
+                    verbose=1)
+
+print( history.history.keys(), '\n' )
+
+history.history['val_loss']
+
+from tensorflow.keras.callbacks import ModelCheckpoint
+
+callback_ModelCheckpoint = ModelCheckpoint(filepath='./ModelCheckpoint',
+                            monitor='val_loss',
+                            save_weights_only=True,
+                            save_best_only=True,
+                            verbose=1)
+
+history = model.fit(x_train, y_train,
+                    validation_split=0.2,
+                    epochs=20, batch_size=32,
+                    callbacks=[callback_ModelCheckpoint],
+                    verbose=1)
+
+loss, accuracy = model.evaluate(x_test, y_test)
+print('\nTest accuracy:', accuracy)
+print('Test loss:', loss)
+
+model.load_weights(filepath='./ModelCheckpoint')
+loss, accuracy = model.evaluate(x_test, y_test)
+print('\nTest accuracy:', accuracy)
+print('Test loss:', loss)
+
+from tensorflow.keras.callbacks import TensorBoard
+
+callback_TensorBoard = TensorBoard(log_dir='./logs', profile_batch=5)
+
+history = model.fit(x_train, y_train,
+                    validation_split=0.2,
+                    epochs=20, batch_size=32,
+                    callbacks=[callback_TensorBoard],
+                    verbose=0)
+
+

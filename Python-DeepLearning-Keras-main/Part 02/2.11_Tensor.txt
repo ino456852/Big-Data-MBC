@@ -1,0 +1,19 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+
+tensor = tf.constant([
+ [[183, 94, 29.07],[183, 89, 26.58]],       #2018 상반기, 하반기
+ [[182, 86, 25.68],[183, 87, 25.98]],       #2019 상반기, 하반기
+ [[183, 94, 28.07],[183, 99, 29.56]],       #2020 상반기, 하반기
+ [[183, 100, 29.86],[183, 96, 28.67]],])    #2021 상반기, 하반기
+
+print(tensor)
+
+tensor_numpy = tensor.numpy()
+
+print(tensor_numpy)
+type(tensor_numpy)
+
+

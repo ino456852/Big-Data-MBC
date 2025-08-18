@@ -1,0 +1,46 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import numpy as np
+
+a = np.arange(1,5)
+b = np.arange(1,3)
+
+print('a :', a, sep='\n')
+print('b :', b, sep='\n')
+
+print( np.add(a, b) )
+
+import numpy as np
+
+a = np.arange(1,7).reshape(2,3) # 행렬 (2x3)
+b = 1                           # 스칼라
+
+print('a', a, sep='\n')
+print('\n a + 1', a + b, sep='\n')
+
+import numpy as np
+
+a = np.arange(1,7).reshape(2,3) # 행렬 (2x3)
+
+b = np.arange(1,4).reshape(1,3) # 행렬 (1x3)
+c = np.arange(1,3).reshape(2,1) # 행렬 (2x1)
+
+print('a', a, sep='\n')
+print('b', b, sep='\n')
+print('c', c, sep='\n')
+
+print('\n a + b', a + b, sep='\n')
+print('\n a + c', a + c, sep='\n')
+
+import numpy as np
+
+a = np.arange(1,3).reshape(1,2) # 행렬 (1x2)
+b = np.arange(1,3).reshape(2,1) # 행렬 (2x1)
+
+print('a', a, sep='\n')
+print('b', b, sep='\n')
+
+print('\n a + b', a + b, sep='\n')
+
+

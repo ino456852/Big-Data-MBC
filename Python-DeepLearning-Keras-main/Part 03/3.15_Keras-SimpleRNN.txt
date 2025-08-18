@@ -1,0 +1,31 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import numpy as np
+
+input_array = np.random.random([2, 3, 4]).astype(np.float32)
+
+print("input_array.shape : ", input_array.shape)
+print(input_array)
+
+from tensorflow.keras.layers import SimpleRNN
+
+simple_rnn = SimpleRNN(units=5)
+output = simple_rnn(inputs=input_array)
+
+print("output.shape : ", output.shape)
+print("\n", output)
+
+from tensorflow.keras.layers import SimpleRNN
+
+simple_rnn = SimpleRNN(units=5, return_sequences=True, return_state=True)
+timesteps_sequence_output, final_state = simple_rnn(input_array)
+
+print("timesteps_sequence_output.shape : ", timesteps_sequence_output.shape)
+print("final_state.shape : ", final_state.shape)
+
+print(timesteps_sequence_output)
+
+print(final_state)
+
+

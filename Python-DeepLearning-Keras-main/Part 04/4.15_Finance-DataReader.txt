@@ -1,0 +1,32 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+!pip install -U finance-datareader
+
+import FinanceDataReader as fdr
+
+fdr.__version__
+
+import FinanceDataReader as fdr
+
+df_krx = fdr.StockListing('KRX')
+df_krx.head()
+
+df_krx[df_krx["Name"] == "삼성전자"]
+
+import FinanceDataReader as fdr
+
+df = fdr.DataReader('005930', '2010-01-01', '2022-12-31')
+df.head(10)
+
+df["Close"].plot()
+
+df["Close"].rolling(7).mean().plot(figsize=(10,5))
+
+df["Close"].expanding(7).mean().plot(figsize=(10,5))
+
+df.rolling(window=7).mean().head(14)
+
+df.ewm(com=0.5).mean()
+
+

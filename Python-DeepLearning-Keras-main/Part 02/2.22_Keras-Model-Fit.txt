@@ -1,0 +1,136 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+from tensorflow.keras import datasets
+
+mnist = datasets.mnist
+(x_train, y_train),(x_test, y_test) = mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+
+print('\ntrain data:', x_train.shape, y_train.shape)
+print('test data:',x_test.shape, y_test.shape)
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Flatten, Dense
+
+model = Sequential([
+  Flatten(input_shape=(28,28)),
+  Dense(32, activation='relu'),
+  Dense(16, activation='relu'),
+  Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.fit(x=x_train, y=y_train, epochs=1)
+
+model.fit(x_train, y_train, epochs=5)
+
+model.fit(x_train, y_train, epochs=2, batch_size=32)
+
+print('train data:', x_train.shape, y_train.shape)
+
+model.fit(x_train, y_train, epochs=2, batch_size=64)
+
+history = model.fit(x_train, y_train, epochs=2, batch_size=64)
+
+print( history.history )
+
+import matplotlib.pyplot as plt
+
+history = model.fit(x_train, y_train, epochs=20, batch_size=64)
+plt.plot( history.history['accuracy'] )
+
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.show()
+
+import tensorflow as tf
+
+train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+train_ds = train_ds.batch(32)
+
+print( 'train_ds type :', type(train_ds) )
+
+model.fit(train_ds, epochs=5)
+
+import tensorflow as tf
+
+test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test))
+test_ds = test_ds.batch(32)
+
+print( 'test_ds type :', type(test_ds) )
+
+loss, accuracy = model.evaluate(test_ds)
+
+print('accuracy:', accuracy)
+print('loss:', loss)
+
+model.fit(x_train, y_train, validation_split=0.2, epochs=5)
+
+print('train data : ', x_train.shape[0]*0.8)
+print('validation date : ', x_train.shape[0]*0.2)
+
+from sklearn.model_selection import train_test_split
+
+x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, 
+                                                  test_size=0.2, 
+                                                  random_state=0)
+
+print (x_train.shape)
+print (x_val.shape)
+
+(x_train, y_train),(x_test, y_test) = mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+
+x_val = x_train[-12000:]
+y_val = y_train[-12000:]
+x_train = x_train[:-12000]
+y_train = y_train[:-12000]
+
+print (x_train.shape)
+print (x_val.shape)
+
+import tensorflow as tf
+
+train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+train_ds = train_ds.batch(32)
+
+val_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+val_ds = val_ds.batch(32)
+
+model.fit(train_ds, validation_data=val_ds, epochs=5)
+
+from tensorflow.keras import Input, Model
+from tensorflow.keras.layers import concatenate
+
+input_image = Input(shape=(784,), name='input_image')
+x1 = Dense(units=32, activation='relu')(input_image)
+x1 = Dense(units=16, activation='relu')(x1)
+
+input_csv = Input(shape=(13,), name='input_csv')
+x2 = Dense(units=16, activation='relu')(input_csv)
+x2 = Dense(units=8, activation='relu')(x2)
+
+x3 = concatenate([x1, x2])
+
+outputA = Dense(8, name='outputA')(x3)
+outputB = Dense(1, name='outputB')(x3)
+
+model = Model(inputs=[input_image, input_csv], outputs=[outputA, outputB])
+
+from tensorflow.keras.utils import plot_model
+
+plot_model(model, "multi_input_and_output_model.png", show_shapes=True)
+
+model.compile(
+    optimizer='adam',
+    loss={
+        "outputA": 'categorical_crossentropy',
+        "outputB": 'binary_crossentropy',
+    }
+)
+
+

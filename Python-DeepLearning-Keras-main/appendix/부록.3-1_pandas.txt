@@ -1,0 +1,36 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+!pip install pandas
+
+import pandas as pd
+
+pd.__version__
+
+df = pd.DataFrame(
+    {
+        "job_title": [
+            "Data Scientist",
+            "Machine Learning Scientist",
+            "Big Data Engineer",
+            "Machine Learning Engineer",
+        ],
+        "salary": [70000, 260000, 85000, 20000],
+        "salary_currency": ["EUR", "USD", "GBP", "USD"],
+        "company_size": ["L", "S", "M", "S"],
+    }
+)
+
+df
+
+df["salary"]
+
+df["salary"].max()
+
+df.describe()
+
+salary = pd.Series([70000, 260000, 85000, 20000], name="salary")
+
+salary
+
+

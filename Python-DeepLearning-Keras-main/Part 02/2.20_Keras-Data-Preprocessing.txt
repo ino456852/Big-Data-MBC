@@ -1,0 +1,141 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+
+file_url = "https://storage.googleapis.com/download.tensorflow.org/data/heart.csv"
+heart_df = pd.read_csv(file_url)
+
+heart_df.info()
+
+from tensorflow.keras.layers.experimental.preprocessing import Normalization
+
+cols = ['age','trestbps','chol','thalach','oldpeak','slope']
+df = heart_df[cols].to_numpy()
+
+layer = Normalization()
+layer.adapt(df)
+layer_df = layer(df)
+
+print("features mean: %.1f" % (layer_df.numpy().mean()))
+print("features std: %.1f" % (layer_df.numpy().std()))
+
+heart_df[cols]
+
+pd.DataFrame(layer_df.numpy(), columns=cols)
+
+heart_df['thal'].value_counts()
+
+heart_df['thal'][:10]
+
+from tensorflow.keras.layers.experimental.preprocessing import StringLookup
+from tensorflow.keras.layers.experimental.preprocessing import CategoryEncoding
+
+df = heart_df['thal'].to_numpy()
+
+layer1 = StringLookup()
+layer1.adapt(df)
+
+layer2 = CategoryEncoding(num_tokens=6, output_mode="one_hot")
+layer2_df = layer2(layer1(df))
+
+print( type(layer2_df) )
+print(layer2_df[:10])
+
+heart_df['fbs'].value_counts()
+
+heart_df['fbs'][:10]
+
+import tensorflow as tf
+from tensorflow.keras.layers.experimental import preprocessing
+
+df = heart_df['fbs'].to_numpy()
+
+layer1 = preprocessing.IntegerLookup()
+layer1.adapt(df)
+
+layer2 = preprocessing.CategoryEncoding(num_tokens=3, output_mode="one_hot")
+#layer2.adapt(layer1(df))
+layer2_df = layer2(layer1(df))
+
+print( type(layer2_df) )
+print(layer2_df[:10])
+
+heart_df['age'].value_counts().count()
+
+heart_df['age'][:10]
+
+import tensorflow as tf
+from tensorflow.keras.layers.experimental import preprocessing
+
+df = heart_df['age'].to_numpy()
+
+layer1 = preprocessing.Hashing(num_bins=16)
+
+layer2 = preprocessing.CategoryEncoding(num_tokens=16, output_mode="one_hot")
+layer2_df = layer2(layer1(df))
+
+print( type(layer2_df) )
+print(layer2_df[:10])
+
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
+from tensorflow.keras.layers.experimental.preprocessing import RandomFlip, RandomRotation
+
+data_augmentation = Sequential(
+  [
+      RandomFlip("horizontal_and_vertical", input_shape=(256, 256, 3)),
+      RandomRotation(0.3),
+  ]
+)
+
+model = Sequential([
+  # 데이터 증강
+  data_augmentation,
+
+  # 합성곱 신경망
+  Conv2D(16, 3, padding='same', activation='relu'),
+  MaxPooling2D(),
+  
+  # 심층 신경망
+  Flatten(),
+  Dense(128, activation='relu'),
+  Dense(1, activation='sigmoid')
+])
+
+model.summary()
+
+from tensorflow.keras.preprocessing import text_dataset_from_directory
+
+# Load the data: IMDB movie review sentiment classification
+!curl -O https://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz
+!tar -xf aclImdb_v1.tar.gz
+
+aclImdb_ds = text_dataset_from_directory(
+    directory = "/content/aclImdb/train",
+    labels="inferred",
+    batch_size=32,
+    seed=0
+)
+
+for text, label in aclImdb_ds.take(1):
+    for i in range(1):
+        print(text.numpy()[i])
+        print(label.numpy()[i])
+
+import tensorflow as tf
+from tensorflow.keras.layers.experimental import preprocessing
+
+layer1 = preprocessing.TextVectorization()
+layer1.adapt(aclImdb_ds.map(lambda text, label: text))
+layer1_df = layer1(['Playing for Time'])
+
+print( type(layer1_df) )
+print( layer1_df )
+
+import numpy as np
+
+vocab = np.array(layer1.get_vocabulary())
+vocab[:20]
+
+

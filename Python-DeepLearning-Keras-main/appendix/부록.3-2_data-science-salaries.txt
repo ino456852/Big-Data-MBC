@@ -1,0 +1,73 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+
+df = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/data/ds_salaries.csv')
+
+df
+
+df.head(10)
+
+df.dtypes
+
+df.to_excel("ds_salaries.xlsx", sheet_name="salaries", index=False)
+
+df_excel = pd.read_excel("ds_salaries.xlsx", sheet_name="salaries")
+
+df_excel.head()
+
+df.info()
+
+job_salary = df[["job_title", "salary"]]
+
+job_salary.head()
+
+job_salary["salary"].shape
+
+job_salary[["job_title", "salary"]].shape
+
+job_salary[job_salary["salary"] > 100000].head()
+
+job_salary[job_salary["job_title"].isin(["Machine Learning Engineer", "Machine Learning Scientist"])]
+
+MachineLearningEngineer_salary = job_salary[(job_salary["job_title"] == "Machine Learning Engineer") & (job_salary["salary"] >= 100000)]
+
+MachineLearningEngineer_salary.head()
+
+job_NA_salary = job_salary[job_salary["salary"].notna()]
+
+print('job_salary : ', job_salary.shape)
+print('job_NA_salary : ', job_NA_salary.shape)
+
+import pandas as pd
+
+df = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/data/ds_salaries.csv')
+
+df.loc[0]
+
+df.loc[df["salary"] > 100000, "job_title"]
+
+df.iloc[0:3, 1:6]
+
+df.iloc[0:3, 4] = "NaN"
+
+df.iloc[0:5, 1:6]
+
+import matplotlib.pyplot as plt
+
+job_salary = df[["job_title", "salary"]]
+
+job_salary.plot()
+
+job_usd_salary = df[["job_title", "salary_in_usd"]]
+
+job_usd_salary.plot()
+
+job_salary_plot = job_usd_salary[job_usd_salary["job_title"].isin(["Data Scientist", "Data Engineer", "Data Analyst"])]
+
+job_salary_plot.plot.scatter(x="job_title", y="salary_in_usd")
+
+job_usd_salary["salary_in_usd"].plot.box()
+
+

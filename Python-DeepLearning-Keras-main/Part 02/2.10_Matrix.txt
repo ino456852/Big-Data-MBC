@@ -1,0 +1,17 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+
+matrix = tf.constant([
+ [182, 99, 29.89],
+ [183, 89, 26.58]])
+
+print(matrix)
+
+matrix_numpy = matrix.numpy()
+
+print(matrix_numpy)
+type(matrix_numpy)
+
+

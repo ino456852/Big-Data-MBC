@@ -1,0 +1,43 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import numpy as np
+
+array_25 = np.reshape(np.arange(10), (2,5))
+print(array_25)
+
+print('\narray_25[:, 0] :', array_25[:, 0])
+print('array_25[:, 1] :', array_25[:, 1])
+print('array_25[:, -1] :', array_25[:, -1])
+
+import numpy as np
+
+array = np.arange(24)
+array = array.reshape(2, 3, 4)
+
+print('array.shape : ', array, array.shape)
+print('\narray[0, 0, 0] :', array[0, 0, 0])
+print('\narray[1, 2, 3] :', array[1, 2, 3])
+
+print(array)
+
+print('\narray[0, :, :] ', array[0, :, :], sep='\n')
+print('array[-1, :, :] ', array[-1, :, :], sep='\n')
+
+print(array)
+
+print('\narray[:, 0, :] ', array[:, 0, :], sep='\n')
+print('array[:, -1, :] ', array[:, -1, :], sep='\n')
+
+print(array)
+
+print('\narray[:, :, 0] ', array[:, :, 0], sep='\n')
+print('array[:, :, -1] ', array[:, :, -1], sep='\n')
+
+print('array[1, 2, 3] ', array[1, 2, 3], sep='\n')
+
+print('\narray[1, 2, :] ', array[1, 2, :], sep='\n')
+print('\narray[1, :, 3] ', array[1, :, 3], sep='\n')
+print('\narray[1, 2, :] ', array[:, 2, 3], sep='\n')
+
+

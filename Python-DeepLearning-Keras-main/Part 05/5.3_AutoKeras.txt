@@ -1,0 +1,36 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+!pip install autokeras
+
+# 라이브러리 로드
+import autokeras as ak
+
+# 모델 생성
+ak.AutoModel(
+    inputs=[ak.ImageInput(), ak.TextInput()],
+    outputs=[ak.ClassificationHead(), ak.RegressionHead()]
+)
+
+# 라이브러리 로드
+import autokeras as ak
+
+# 이미지 입력 출력 생성
+image_input = ak.ImageInput()
+image_output = ak.ImageBlock()(image_input)
+
+# 텍스트 입력 출력 생성
+text_input = ak.TextInput()
+text_output = ak.TextBlock()(text_input)
+
+output = ak.Merge()([image_output, text_output])
+classification_output = ak.ClassificationHead()(output)
+regression_output = ak.RegressionHead()(output)
+
+# 모델 생성
+ak.AutoModel(
+    inputs=[image_input, text_input],
+    outputs=[classification_output, regression_output]
+)
+
+

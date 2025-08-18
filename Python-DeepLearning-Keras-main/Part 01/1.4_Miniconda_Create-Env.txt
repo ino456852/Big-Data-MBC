@@ -1,0 +1,20 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+conda create -n keras-2.10 python
+
+conda env list
+
+conda activate keras-2.10
+
+conda deactivate
+
+conda remove -n keras-2.10 --all
+
+conda activate keras-2.10
+
+conda install -c conda-forge tensorflow==2.10
+
+conda install -c anaconda ipykernel
+
+conda update --all

@@ -1,0 +1,21 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+from tensorflow.keras import datasets
+
+(x_train, y_train), (x_test, y_test) = datasets.imdb.load_data(num_words=25000)
+
+len(x_train[0]), len(x_train[1])
+
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+print( len(x_train[0]), len(x_train[1]) )
+
+x_train = pad_sequences(sequences=x_train, maxlen=256, padding='pre')
+x_test = pad_sequences(sequences=x_test, maxlen=256, padding='pre')
+
+print( len(x_train[0]), len(x_train[1]) )
+
+x_train[1]
+
+

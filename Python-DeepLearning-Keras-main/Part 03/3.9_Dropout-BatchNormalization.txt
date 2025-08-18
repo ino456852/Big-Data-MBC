@@ -1,0 +1,84 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+# 데이터 구성 및 준비하기
+data = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/data/NHANES Weight and Height/data.csv')
+
+def BMI_Classification(BMI):
+    if BMI <= 18.5:
+        return 0 #'저체중'
+    elif (18.5 < BMI <= 23):
+        return 1 #'정상'
+    elif (23 < BMI <= 25):
+        return 2 #'과체중'
+    elif (25 < BMI <= 30):
+        return 3 #'비만'
+    elif BMI > 30:
+        return 4 #'고도비만'
+
+data['BMI_CF'] = data['BMI(kg/m**2)'].apply(BMI_Classification)
+
+feature_cols = ['Weight (kg)', 'Standing Height (cm)']
+
+label = data.pop('BMI_CF')
+feature = data[feature_cols].copy()
+
+# 학습과 테스트 데이터 분리 (학습 80%, 테스트 20%)
+train_x, test_x, train_y, test_y = train_test_split(feature, label, test_size=0.2, random_state=0)
+# 학습과 검증 데이터 분리 (학습 80%, 검증 20%)
+train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size=0.2, random_state=0)
+
+print('train dataset :', train_x.shape, train_y.shape)
+print('validation dataset :', val_x.shape, val_y.shape)
+print('test dataset :', test_x.shape, test_y.shape)
+
+from tensorflow.keras.callbacks import EarlyStopping
+from keras.callbacks import LambdaCallback
+
+# EarlyStopping
+early_stopping = EarlyStopping(patience = 20)
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.layers import Dropout, BatchNormalization
+
+tf.random.set_seed(0)
+
+# 모델 생성 
+model = Sequential([
+    Dense(units=1024, activation='relu', input_shape=[2]),
+    Dropout(0.3),
+    Dense(units=1024, activation='relu'),
+    Dropout(0.3),
+    Dense(units=1024, activation='relu'),
+    Dropout(0.3),
+    Dense(units=5, activation='softmax') # Classification
+])
+
+# 모델 컴파일 
+model.compile(loss='sparse_categorical_crossentropy',
+              optimizer='adam',
+              metrics=['accuracy'])
+
+model.summary()
+
+history = model.fit(train_x, train_y,
+                    validation_data=(val_x, val_y),
+                    epochs=1000,
+                    callbacks=early_stopping)
+
+import plotly.graph_objects as go
+
+fig = go.Figure( )
+fig.add_trace(go.Scattergl(y=history.history['loss'], name='loss')) 
+fig.add_trace(go.Scattergl(y=history.history['val_loss'], name='val_loss')) 
+fig.update_layout(title="<b>Loss of Model</b>", xaxis_title='Epoch', yaxis_title='Loss', template='plotly')
+fig.show( )
+
+model.evaluate(test_x, test_y)
+
+

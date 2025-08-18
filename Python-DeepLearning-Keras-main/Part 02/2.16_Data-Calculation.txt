@@ -1,0 +1,77 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import numpy as np
+
+vector_a = np.arange(1,3)
+vector_b = np.arange(3,5)
+
+print('vector_a :', vector_a)
+print('vector_b :', vector_b)
+
+# 사칙연산 덧셈
+print( vector_b + vector_a )
+
+print( np.add(vector_b, vector_a) )
+
+# 사칙연산 빨셈
+print( vector_b - vector_a )
+
+print( np.subtract(vector_b, vector_a) )
+
+# 사칙연산 곱셈
+print( vector_b * vector_a )
+
+print( np.multiply(vector_b, vector_a) )
+
+# 사칙연산 나눗셈
+print( vector_b / vector_a )
+
+print( np.divide(vector_b, vector_a) )
+
+import numpy as np
+
+matrix_a = np.arange(1,5).reshape(2,2)
+matrix_b = np.arange(5,9).reshape(2,2)
+
+print('matrix_a :', matrix_a, sep='\n')
+print('matrix_b :', matrix_b, sep='\n')
+
+# 사칙연산 (+)
+print( 'matrix.add() : ', np.add(matrix_b, matrix_a) ,sep='\n' )
+
+# 사칙연산 (-)
+print( '\nmatrix.subtract() : ', np.subtract(matrix_b, matrix_a) ,sep='\n' )
+
+# 사칙연산 (*)
+print( '\nmatrix.multiply() : ', np.multiply(matrix_b, matrix_a) ,sep='\n' )
+
+# 사칙연산 (/)
+print( '\nmatrix.divide() : ', np.divide(matrix_b, matrix_a) ,sep='\n' )
+
+import numpy as np
+
+vector_a = np.arange(1, 10, 3)
+vector_b = np.arange(1, 10, 4)
+
+print('a :', vector_a)
+print('b :', vector_b)
+
+print( 'a == b : ', vector_a == vector_b )
+print( 'a < b :  ', vector_a < vector_b )
+print( 'a > b :  ', vector_a > vector_b )
+
+import numpy as np 
+
+vector_nan = np.empty((2, 2))
+
+print( vector_nan )
+print( np.isnan(vector_nan) )
+
+vector_nan[:, 1] = np.nan
+
+print( vector_nan )
+print( np.isnan(vector_nan) )
+print( np.isnan(vector_nan).sum() )
+
+

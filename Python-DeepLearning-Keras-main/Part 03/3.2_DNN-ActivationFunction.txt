@@ -1,0 +1,52 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+from tensorflow.keras import activations
+
+x = tf.constant([-9, -6, -3, 0, 3, 6, 9])
+
+activations.relu(x).numpy()
+
+x = tf.constant([-9, -6, -3, 0, 3, 6, 9])
+
+# threshold 기본값은 0이며 6으로 설정함
+tf.keras.activations.relu(x, threshold=6).numpy()
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+model = Sequential([
+    Dense(units=2, activation='relu', input_shape=[2]),
+    Dense(units=1, activation='relu'),
+    Dense(units=1) # activation='linear'
+])
+
+model.compile(loss='mae',
+              optimizer='adam',
+              metrics=['mae', 'mse'])
+
+model.summary()
+
+train_x = [(97.1, 160.2), (98.8, 182.3), (74.3, 184.2), (103.7, 185.3), (83.3, 177.1)]
+train_y = [37.8, 29.7, 21.9, 30.2, 26.6]
+
+model.fit(train_x, train_y, 
+          epochs=1000)
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+data = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/data/NHANES Weight and Height/data.csv')
+
+feature_cols = ['Weight (kg)', 'Standing Height (cm)']
+label = data.pop('BMI(kg/m**2)')
+feature = data[feature_cols].copy()
+
+train_x, test_x, train_y, test_y = train_test_split(feature, label, test_size=0.2)
+print('test dataset :', test_x.shape, test_y.shape)
+
+model.evaluate(test_x, test_y)
+
+

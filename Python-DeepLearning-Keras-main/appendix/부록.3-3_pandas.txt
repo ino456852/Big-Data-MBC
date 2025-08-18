@@ -1,0 +1,55 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+
+df = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/data/ds_salaries.csv')
+
+job_salary = df[["Unnamed: 0", "work_year", "job_title", "salary_currency", "salary", "salary_in_usd"]].copy()
+job_salary = job_salary[job_salary["salary_currency"] == "USD"]
+
+# salary_in_eur = salary_in_usd * 0.97
+job_salary["salary_in_eur"] = job_salary["salary_in_usd"] * 0.97
+
+job_salary.head()
+
+job_salary = job_salary.rename(
+    columns={
+        "Unnamed: 0": "no",
+    }
+)
+
+job_salary.head()
+
+job_salary.rename(columns=str.upper)
+
+job_salary["salary_in_usd"].mean()
+
+job_salary[["salary_in_usd", "salary_in_eur"]].median()
+
+job_salary[["salary_in_usd", "salary_in_eur"]].describe()
+
+job_salary = df[["work_year", "job_title",  "salary_currency",  "salary", "salary_in_usd"]].copy()
+job_salary["salary_in_eur"] = job_salary["salary_in_usd"] * 0.97
+
+job_salary.head()
+
+job_salary[["work_year", "salary_in_usd", "salary_in_eur"]].groupby("work_year").mean()
+
+job_salary.groupby(["work_year", "salary_currency"]).mean()
+
+job_salary.groupby("salary_currency")["salary"].mean()
+
+job_salary.groupby(["job_title", "salary_currency"])["salary"].mean()
+
+job_salary["job_title"].value_counts().head()
+
+job_salary.groupby("job_title")["job_title"].count().head()
+
+job_salary.groupby(["work_year", "job_title"])["job_title"].count()
+
+job_salary.sort_values(by="salary_in_usd").head()
+
+job_salary.sort_values(by=['work_year', 'salary_in_usd'], ascending=False).head()
+
+

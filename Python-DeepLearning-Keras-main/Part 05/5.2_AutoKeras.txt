@@ -1,0 +1,16 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+# pip패키지로 오토케라스 설치
+
+!pip install autokeras
+
+import autokeras as ak
+from tensorflow.keras.datasets import mnist
+
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+clf = ak.ImageClassifier()
+clf.fit(x_train, y_train)
+results = clf.predict(x_test)
+
+

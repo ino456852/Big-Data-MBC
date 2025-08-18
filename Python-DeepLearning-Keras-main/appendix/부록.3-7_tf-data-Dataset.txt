@@ -1,0 +1,163 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+
+dataset = tf.data.Dataset.from_tensor_slices([1, 2, 3, 4, 5])
+
+dataset
+
+for data in dataset:
+  print(data.numpy())
+
+dataset = tf.data.Dataset.from_tensor_slices([1, 2, 3, 4, 5])
+
+for data in dataset:
+  print(data)
+
+for data in dataset.as_numpy_iterator():
+  print(data)
+
+dataset = tf.data.Dataset.range(10) # range(start=0, stop=10)
+
+list(dataset.as_numpy_iterator())
+
+dataset = tf.data.Dataset.range(0, 10) # range(start, stop)
+
+list(dataset.as_numpy_iterator())
+
+dataset = tf.data.Dataset.range(0, 10, 2) # range(start, stop, step)
+
+list(dataset.as_numpy_iterator())
+
+dataset = tf.data.Dataset.range(10, 0, -1) # range(start, stop, step)
+
+list(dataset.as_numpy_iterator())
+
+dataset = tf.data.Dataset.range(10, 0, -1, output_type=tf.float32)
+
+list(dataset.as_numpy_iterator())
+
+dataset1 = tf.data.Dataset.random(seed=0).take(10)
+dataset2 = tf.data.Dataset.random(seed=1).take(10)
+dataset3 = tf.data.Dataset.random().take(10)
+
+print(list(dataset1.as_numpy_iterator()), '\n')
+print(list(dataset2.as_numpy_iterator()), '\n')
+print(list(dataset3.as_numpy_iterator()))
+
+dataset = tf.data.Dataset.range(10)
+print(list(dataset.as_numpy_iterator()), '\n')
+
+dataset = dataset.shuffle(buffer_size=10, seed=0)
+print(list(dataset.as_numpy_iterator()))
+print(list(dataset.as_numpy_iterator()))
+
+dataset = tf.data.Dataset.range(10)
+print(list(dataset.as_numpy_iterator()), '\n')
+
+dataset = dataset.shuffle(buffer_size=10, seed=0, reshuffle_each_iteration=False)
+
+print(list(dataset.as_numpy_iterator()))
+print(list(dataset.as_numpy_iterator()))
+
+a = tf.data.Dataset.range(0, 5)  
+b = tf.data.Dataset.range(5, 10)  
+
+print(list(a.as_numpy_iterator()))
+print(list(b.as_numpy_iterator()), '\n')
+
+dataset = a.concatenate(b)
+print(list(dataset.as_numpy_iterator()))
+
+c = tf.data.Dataset.from_tensor_slices(["abc"])
+a.concatenate(c)
+
+dataset = tf.data.Dataset.range(10)
+print(list(dataset.as_numpy_iterator()), '\n')
+
+list(dataset.take(3).as_numpy_iterator())
+
+dataset = dataset.take_while(lambda x: x < 5)
+
+list(dataset.as_numpy_iterator())
+
+dataset = tf.data.Dataset.range(10)
+
+dataset = dataset.filter(lambda x: x < 5)
+list(dataset.as_numpy_iterator())
+
+dataset = tf.data.Dataset.range(10)
+
+def filter_fn(x):
+  return tf.math.equal(x, 5)
+  
+list(dataset.filter(filter_fn).as_numpy_iterator())
+
+dataset = tf.data.Dataset.range(10)
+def transformation_fn(ds):
+  return ds.filter(lambda x: x < 5)
+
+list(dataset.apply(transformation_fn).as_numpy_iterator())
+
+dataset = tf.data.Dataset.range(10)
+
+list(dataset.batch(3).as_numpy_iterator())
+
+dataset = tf.data.Dataset.range(10)
+
+list(dataset.batch(3, drop_remainder=True).as_numpy_iterator())
+
+dataset = tf.data.Dataset.range(5, 10)
+print(list(dataset.as_numpy_iterator()), '\n')
+
+print(list(dataset.map(lambda x: x * 2).as_numpy_iterator()))
+
+dataset = tf.data.Dataset.range(10).batch(3)
+print(list(dataset.as_numpy_iterator()), '\n')
+
+list(dataset.flat_map(lambda x: tf.data.Dataset.from_tensor_slices(x))
+    .as_numpy_iterator())
+
+dataset = tf.data.Dataset.range(10).window(size=5)
+
+for window in dataset:
+  print(list(window.as_numpy_iterator()))
+
+# window(size=4)
+dataset = tf.data.Dataset.range(10).window(size=4)
+
+for window in dataset:
+  print(list(window.as_numpy_iterator()))
+
+# drop_remainder=True)
+dataset = tf.data.Dataset.range(10).window(size=4, drop_remainder=True)
+
+for window in dataset:
+  print(list(window.as_numpy_iterator()))
+
+# shift=1
+dataset = tf.data.Dataset.range(10).window(size=4, drop_remainder=True, shift=1)
+
+for window in dataset:
+  print(list(window.as_numpy_iterator()))
+
+# shift=2
+dataset = tf.data.Dataset.range(10).window(size=4, drop_remainder=True, shift=2)
+
+for window in dataset:
+  print(list(window.as_numpy_iterator()))
+
+# stride=1
+dataset = tf.data.Dataset.range(10).window(size=4, drop_remainder=True, shift=2, stride=1)
+
+for window in dataset:
+  print(list(window.as_numpy_iterator()))
+
+# stride=2
+dataset = tf.data.Dataset.range(10).window(size=4, drop_remainder=True, shift=2, stride=2)
+
+for window in dataset:
+  print(list(window.as_numpy_iterator()))
+
+

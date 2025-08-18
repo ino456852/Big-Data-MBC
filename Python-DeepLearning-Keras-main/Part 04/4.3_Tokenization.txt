@@ -1,0 +1,18 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+# KoNLPy 공식홈페이지 : https://konlpy.org/ko/latest/install/
+
+!pip3 install konlpy
+
+from konlpy.tag import Okt
+#from konlpy.tag import Okt, Mecab
+
+okt = Okt()
+#mecab = Mecab()
+
+okt.morphs('the first story is about connection the dots.')
+
+okt.morphs('첫번째 이야기는 점들의 연결에 관한 것이다.')
+
+

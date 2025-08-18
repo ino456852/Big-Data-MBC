@@ -1,0 +1,52 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import numpy as np
+
+array = np.arange(10)
+
+print(array)
+print('array.ndim : ', array.ndim)
+print('array.shape : ', array.shape)
+
+array_25 = np.reshape(array, (2,5))
+array_52 = np.reshape(array, (5,2))
+
+print(array_25)
+print('array_25.ndim :', array_25.ndim)
+print('array_25.shape :', array_25.shape)
+
+print('\n')
+print(array_52, array_52.ndim, array_52.shape)
+print('array_52.ndim :', array_52.ndim)
+print('array_52.shape :', array_52.shape)
+
+import numpy as np
+
+# arange(0, 24, 1)
+array = np.arange(0, 24, 1)
+
+print(array)
+print('\narray.ndim :', array.ndim)
+print('array.shape :', array.shape)
+
+# reshape(4,3,2)
+array = array.reshape(4,3,2)
+
+print('\n', array)
+print('\narray.ndim :', array.ndim)
+print('array.shape :', array.shape)
+
+import numpy as np
+
+array = np.zeros((5, 5))
+array[:,2] = 255
+
+print(array, array.shape)
+
+array.reshape(-1)
+
+print( 'array.flatten()\n', array.flatten() )
+print( '\narray.ravel()\n', array.ravel() )
+
+

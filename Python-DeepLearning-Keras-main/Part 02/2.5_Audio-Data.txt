@@ -1,0 +1,10 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import os
+ 
+path_dir = '/content/drive/MyDrive/Colab Notebooks/data/TensorFlow Speech Recognition Challenge/train/audio'
+
+print(os.listdir(path_dir))
+
+

@@ -1,0 +1,296 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+model = Sequential([
+
+  Dense(32, activation='relu'),
+  Dense(16, activation='relu'),
+  Dense(10, activation='softmax')
+
+])
+
+model = Sequential()
+
+model.add(Dense(32, activation='relu'))
+model.add(Dense(16, activation='relu'))
+model.add(Dense(10, activation='softmax'))
+
+from tensorflow.keras import Input
+
+model = Sequential()
+
+model.add(Input(shape=(28,28)))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(16, activation='relu'))
+model.add(Dense(10, activation='softmax'))
+
+model.summary()
+
+model = Sequential(name='model')
+
+model.add(Input(shape=(28,28)))
+model.add(Dense(32, activation='relu', name='layer1'))
+model.add(Dense(16, activation='relu', name='layer2'))
+model.add(Dense(10, activation='softmax', name='layer3'))
+
+model.summary()
+
+model = Sequential(name='model')
+
+model.add(Dense(32, activation='relu', name='layer1', input_shape=(28,28)))
+model.add(Dense(16, activation='relu', name='layer2'))
+model.add(Dense(10, activation='softmax', name='layer3'))
+
+model.summary()
+
+model = Sequential(name='model')
+
+model.add(Dense(32, activation='relu', name='layer1', input_dim=784))
+model.add(Dense(16, activation='relu', name='layer2'))
+model.add(Dense(10, activation='softmax', name="layer3"))
+
+model.summary()
+
+from tensorflow.keras import Input, Model
+from tensorflow.keras.layers import Dense
+
+input = Input(shape=(784,))
+x = Dense(units=32, activation='relu')(input)
+x = Dense(units=16, activation='relu')(x)
+output = Dense(units=10, activation='softmax')(x)
+
+model = Model(inputs=input, outputs=output, name='mnist')
+model.summary()
+
+from tensorflow.keras.utils import plot_model
+
+plot_model(model, "mnist-model.png", show_shapes=True)
+
+from tensorflow.keras.layers import concatenate
+
+input_image = Input(shape=(784,), name="input_image")
+input_csv = Input(shape=(13,), name="input_csv")
+
+x1 = Dense(units=32, activation="relu", name="layer10")(input_image)
+x1 = Dense(units=16, activation="relu", name="layer11")(x1)
+output_image = Dense(units=10, activation='softmax', name="output_image")(x1)
+
+x2 = Dense(units=16, activation="relu", name="layer20")(input_csv)
+x2 = Dense(units=8, activation="relu", name="layer21")(x2)
+output_csv = Dense(units=1, activation='sigmoid', name="output_csv")(x2)
+
+# keras.layers.concatenate
+x3 = concatenate([output_image, output_csv], name="layer30")
+output = Dense(8, activation="sigmoid", name="output")(x3)
+
+model = Model([input_image, input_csv], output, name="Model : Multiple Inputs")
+model.summary()
+
+from tensorflow.keras.utils import plot_model
+
+plot_model(model, "mnist-model.png", show_shapes=True)
+
+from tensorflow.keras.layers import concatenate
+
+input = Input(shape=(784,), name="input")
+
+x = Dense(units=32, activation="relu", name="layer1")(input)
+x = Dense(units=16, activation="relu", name="layer2")(x)
+x = Dense(units=8, activation="relu", name="layer3")(x)
+
+outputA = Dense(units=10, activation='softmax', name="output_a")(x)
+outputB = Dense(units=1, activation='sigmoid', name="output_b")(x)
+
+model = Model(input, [outputA, outputB], name="Model : Multiple Oututs")
+model.summary()
+
+from tensorflow.keras.utils import plot_model
+
+plot_model(model, "mnist-model.png", show_shapes=True)
+
+from tensorflow.keras.layers import concatenate
+
+input_imageA = Input(shape=(784,), name="input_imageA")
+input_imageB = Input(shape=(784,), name="input_imageB")
+
+# Shared layers
+dense_layer = Dense(units=32, activation="relu")
+
+output_imageA = dense_layer(input_imageA)
+output_imageB = dense_layer(input_imageB)
+
+# keras.layers.concatenate
+x = concatenate([output_imageA, output_imageB])
+output = Dense(10, activation="softmax", name="output")(x)
+
+model = Model([input_imageA, input_imageB], output, name="Model : Shared layers")
+model.summary()
+
+from tensorflow.keras.utils import plot_model
+
+plot_model(model, "mnist-model.png", show_shapes=True)
+
+class MnistModel(tf.keras.Model):
+  def __init__(self):
+    super(MnistModel, self).__init__()
+    self.layer1 = Dense(32, activation='relu')
+    self.layer2 = Dense(16, activation='relu')
+    self.layer3 = Dense(10, activation='softmax')
+
+  def call(self, x):
+    x = self.layer1(x)
+    x = self.layer2(x)
+    x = self.layer3(x)
+    return x
+
+model = MnistModel()
+model(Input(shape=(784,)))
+
+model.summary()
+
+class MnistModel(tf.keras.Model):
+  def __init__(self, units, activation):
+    super(MnistModel, self).__init__()
+    self.layer1 = Dense(units, activation=activation)
+    self.layer2 = Dense(units/2, activation=activation)
+    self.layer3 = Dense(10, activation='softmax')
+
+  def call(self, x):
+    x = self.layer1(x)
+    x = self.layer2(x)
+    x = self.layer3(x)
+    return x
+
+model = MnistModel(units=32, activation='relu')
+model(Input(shape=(784,)))
+
+model.summary()
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+def get_model():
+    model = Sequential()
+    model.add(Dense(32, activation='relu', input_dim=784))
+    model.add(Dense(16, activation='relu'))
+    model.add(Dense(10, activation='softmax'))
+    model.compile(optimizer='adam',
+                loss='sparse_categorical_crossentropy',
+                metrics=['accuracy'],
+    )
+    return model
+
+model = get_model()
+model.summary()
+
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.compile(optimizer='adam', 
+              loss={'output_a' : 'categorical_crossentropy',
+                    'output_b' : 'binary_crossentropy'})
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+model = Sequential(name='mnist-model')
+model.add(Dense(32, activation='relu', name='layer1', input_dim=784))
+model.add(Dense(16, activation='relu', name='layer2'))
+model.add(Dense(10, activation='softmax', name='layer3'))
+
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.summary()
+
+# 모델 저장하기
+model.save("/content/drive/MyDrive/Colab Notebooks/model")
+
+from tensorflow.keras.models import load_model
+
+# 모델 불러오기
+model = load_model("/content/drive/MyDrive/Colab Notebooks/model")
+
+model.summary()
+
+from tensorflow.keras.models import save_model, load_model
+
+# save_model
+model.save("/content/drive/MyDrive/Colab Notebooks/model")
+
+save_model(model=model, filepath="/content/drive/MyDrive/Colab Notebooks/model")
+
+# load_model
+model = load_model("/content/drive/MyDrive/Colab Notebooks/model")
+
+!ls -1 "/content/drive/MyDrive/Colab Notebooks/model/"
+
+# 케라스 h5 파일 형식으로 모델 저장
+model.save("/content/drive/MyDrive/Colab Notebooks/model/model-h5/mnist-model-h5.h5")
+
+model = load_model("/content/drive/MyDrive/Colab Notebooks/model/model-h5/mnist-model-h5.h5")
+
+model.summary()
+
+!ls -1 "/content/drive/MyDrive/Colab Notebooks/model/model-h5"
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras import Input
+from tensorflow.keras.layers import Dense
+
+modelA = Sequential([Input((784,)), Dense(32), Dense(16), Dense(10)], name = "modelA")
+
+config = modelA.get_config()
+modelB = Sequential.from_config(config)
+
+modelB.summary()
+
+from tensorflow.keras import Model, Input
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+input = Input((32,))
+output = Dense(1)(input)
+modelA = Model(input, output, name="modelA")
+
+config = modelA.get_config()
+modelB = Model.from_config(config)
+
+modelB.summary()
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras import Input
+from tensorflow.keras.layers import Dense
+
+from tensorflow.keras.models import model_from_json
+
+modelA = Sequential([Input((784,)), Dense(32), Dense(16), Dense(10)] , name = "modelA")
+
+json_config = modelA.to_json()
+
+modelB = model_from_json(json_config)
+
+print(json_config)
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+model = Sequential(name="minit-model")
+model.add(Dense(32, activation="relu", name="layer1", input_shape=(784,)))
+model.add(Dense(16, activation="relu", name="layer2"))
+model.add(Dense(10, activation='softmax', name="layer3"))
+
+model.save_weights("/content/drive/MyDrive/Colab Notebooks/model/weights/minit-weight")
+
+model.load_weights("/content/drive/MyDrive/Colab Notebooks/model/weights/minit-weight")
+
+!ls -1 "/content/drive/MyDrive/Colab Notebooks/model/weights"
+
+

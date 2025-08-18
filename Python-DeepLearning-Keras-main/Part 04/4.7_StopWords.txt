@@ -1,0 +1,39 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+!pip install --user -U nltk
+
+import nltk
+from nltk.corpus import stopwords
+
+nltk.download('stopwords')
+
+stopwords = stopwords.words('english')
+
+print('\n', stopwords)
+print('\n', len(stopwords))
+
+from nltk.tokenize import word_tokenize
+import nltk
+nltk.download('punkt')
+
+s = 'The first story is about connecting the dots.'
+print('\n', word_tokenize(s))
+
+print(word_tokenize(s))
+
+print([word for word in word_tokenize(s) if word not in stopwords])
+
+!pip3 install konlpy
+
+from konlpy.tag import Okt
+
+okt = Okt()
+okt_tokenize = okt.morphs('첫 번째 이야기는 점들을 연결하는 것입니다.')
+
+stopwords = ['는', '들', '을', '것', '하는', '입니다']
+
+print('\n as-is : ', okt_tokenize)
+print('\n to-be : ', [word for word in okt_tokenize if word not in stopwords])
+
+

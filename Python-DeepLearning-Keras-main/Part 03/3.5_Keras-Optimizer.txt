@@ -1,0 +1,19 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Input, Dense
+
+model = Sequential([
+    Dense(units=2, activation='relu', input_shape=[2]),
+    Dense(units=1) # activation='linear'
+])
+
+model.compile(loss='mae',
+              optimizer='adam',
+              metrics=['mae', 'mse'])
+              
+model.summary()
+
+

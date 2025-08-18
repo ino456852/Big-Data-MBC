@@ -1,0 +1,30 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+
+index = pd.date_range("2022-01-01", periods=31, freq="D")
+
+index
+
+import numpy as np
+
+data = np.random.randint(0, 100, size=31)
+
+df = pd.DataFrame(data=data, index=index, columns=["Close"]) 
+print(df.head())
+
+df.plot()
+
+import numpy as np
+
+data = np.random.randint(0, 100, size=(31, 5))
+
+df = pd.DataFrame(data=data, index=index, columns=["Open", "High", "Low", "Close", "Volume"])
+df.head()
+
+df[["Open", "Close"]].plot(figsize=(15, 5))
+
+df.info()
+
+

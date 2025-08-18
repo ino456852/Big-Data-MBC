@@ -1,0 +1,14 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+
+train_data = pd.read_csv("https://storage.googleapis.com/tf-datasets/titanic/train.csv")
+
+train_data.head(10)
+
+train_data.shape
+
+train_data.info()
+
+

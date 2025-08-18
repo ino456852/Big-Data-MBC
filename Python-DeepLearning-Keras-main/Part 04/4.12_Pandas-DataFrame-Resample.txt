@@ -1,0 +1,39 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+import numpy as np
+
+index = pd.date_range(start="2010-01-01", end="2021-12-31")
+data = np.random.randint(0, 100, size=(len(index), 5))
+
+df = pd.DataFrame(data=data, index=index, columns=["Open", "High", "Low", "Close", "Volume"])
+df.head()
+
+df.groupby([df.index.year]).mean()
+
+df.groupby([df.index.year, df.index.month]).mean()
+
+# ruleDateOffset, Timedelta or str
+# A : year end frequency
+
+df.resample(rule='A').mean().head()
+
+# ruleDateOffset, Timedelta or str
+# M : month end frequency
+
+df.resample(rule='M').mean().head()
+
+df.resample(rule='M').min().head()
+
+df.resample(rule='M').max().head()
+
+df.resample(rule='7D').mean()
+
+df.resample('12H').mean()
+
+df.resample('12H').pad().head(6)
+
+df.resample('12H').bfill().head(6)
+
+

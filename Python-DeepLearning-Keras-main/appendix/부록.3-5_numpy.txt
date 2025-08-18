@@ -1,0 +1,69 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+# conda 설치
+# !conda install numpy
+
+# pip 설치
+!pip install numpy
+
+import numpy as np
+
+np.__version__
+
+import numpy as np
+
+array = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+array
+
+a = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+b = np.array([1.1, 2.2, 3.3, 4.4, 5.5])
+
+print('a.dtype :', a.dtype)
+print('b.dtype :', b.dtype)
+
+array = np.array([(1, 2, 3), (4, 5, 6), (7, 8, 9)])
+
+print('array.shape :', array.shape)
+print(array)
+
+np.zeros((2, 3))
+
+np.ones((2, 3, 4), dtype=np.int16)
+
+np.empty((2, 3))
+
+array = np.arange(10)
+array
+
+array = np.arange(1, 10, 2)
+array
+
+a = np.array([5, 10, 15])
+b = np.array([5])
+
+c = a - b
+c
+
+a = np.array([5, 10, 15])
+b = np.array([5])
+
+c = a - b
+print(c)
+
+d = c < 5
+print(d)
+
+a = np.array([[1, 2],
+              [3, 4]])
+b = np.array([[1, 2],
+              [3, 4]])
+# 아다마르곱
+print('elementwise product       \n', a * b)
+# 행렬곱셈
+print('matrix product            \n', a @ b)
+# 스칼라곱
+print('dot product               \n', a.dot(b))
+
+

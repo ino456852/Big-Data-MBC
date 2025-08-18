@@ -1,0 +1,84 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow_datasets as tfds
+
+tfds.__version__
+
+dataset, info = tfds.load('rock_paper_scissors',
+                           split='train',
+                           with_info=True,
+                           as_supervised=True)
+
+info
+
+info.features["label"].names
+
+info.features['label'].num_classes
+
+import matplotlib.pyplot as plt
+
+image, label = next(iter(dataset))
+plt.imshow(image)
+
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers.experimental.preprocessing import RandomContrast
+
+DataAugmentation_RandomContrast = Sequential([
+    RandomContrast(factor=0.3, seed=0)
+])
+
+img = DataAugmentation_RandomContrast(image)
+plt.imshow(img/255)
+
+from tensorflow.keras.layers.experimental.preprocessing import RandomCrop
+
+DataAugmentation_RandomCrop = Sequential([
+    RandomCrop(height=200, width=200, seed=0)
+])
+
+img = DataAugmentation_RandomCrop(image)
+plt.imshow(img/255)
+
+from tensorflow.keras.layers.experimental.preprocessing import RandomZoom
+
+DataAugmentation_RandomZoom = Sequential([
+    RandomZoom(height_factor=.8, width_factor=.8)
+])
+
+img = DataAugmentation_RandomZoom(image)
+plt.imshow(img/255)
+
+# 크기 및 배율 조정하기
+from tensorflow.keras.layers.experimental.preprocessing import Resizing
+from tensorflow.keras.layers.experimental.preprocessing import Rescaling
+
+ResizingRescaling = Sequential([
+    Resizing(height=150, width=150),
+    Rescaling(scale=1./255)
+])
+
+img = ResizingRescaling(image)
+plt.imshow(img)
+
+import tensorflow as tf
+from tensorflow.keras.layers.experimental.preprocessing import RandomFlip
+from tensorflow.keras.layers.experimental.preprocessing import RandomRotation
+
+# 데이터 증강
+DataAugmentation = tf.keras.Sequential([
+    RandomFlip(mode="horizontal_and_vertical", seed=0),
+    RandomRotation(factor=0.2, seed=0)
+])
+
+# Add the image to a batch
+img = tf.expand_dims(image, 0)
+
+plt.figure(figsize=(10, 10))
+for i in range(9):
+  augmented_image = DataAugmentation(img)
+  ax = plt.subplot(3, 3, i + 1)
+  plt.imshow(augmented_image[0]/255)
+  plt.axis("off")
+
+

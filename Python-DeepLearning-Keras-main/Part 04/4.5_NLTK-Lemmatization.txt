@@ -1,0 +1,32 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+!pip install --user -U nltk
+
+import nltk
+
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+from nltk.stem import WordNetLemmatizer
+wnl = WordNetLemmatizer()
+
+print(wnl.lemmatize('bad'))
+print(wnl.lemmatize('worse', pos='a'))
+print(wnl.lemmatize('worst', pos='a'))
+
+from nltk.stem import WordNetLemmatizer
+wnl = WordNetLemmatizer()
+
+# teach
+# 3인칭 단수 현재 teaches 
+# 과거형 taught 
+# 과거 분사 taught 
+# 현재 분사 teaching
+
+print(wnl.lemmatize('teach', pos='v'))
+print(wnl.lemmatize('teaches', pos='v'))
+print(wnl.lemmatize('taught', pos='v'))
+print(wnl.lemmatize('teaching', pos='v'))
+
+

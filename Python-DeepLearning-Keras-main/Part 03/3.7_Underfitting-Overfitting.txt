@@ -1,0 +1,70 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+# 데이터 구성 및 준비하기
+data = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/data/NHANES Weight and Height/data.csv')
+
+feature_cols = ['Weight (kg)', 'Standing Height (cm)']
+
+label = data.pop('BMI(kg/m**2)')
+feature = data[feature_cols].copy()
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+# 모델 생성 
+model = Sequential([
+    Dense(units=64, activation='relu', input_shape=[2]),
+    Dense(units=32, activation='relu'),
+    Dense(units=16, activation='relu'),
+    Dense(units=1) # activation='linear'
+])
+
+model.summary()
+
+# 모델 컴파일 
+model.compile(loss='mae',
+              optimizer='adam',
+              metrics=['mae', 'mse'])
+
+from tensorflow.keras.callbacks import EarlyStopping
+
+# EarlyStopping
+early_stopping = EarlyStopping(patience = 20)
+
+from sklearn.model_selection import train_test_split
+
+# 학습과 테스트 데이터 분리 (학습 80%, 테스트 20%)
+train_x, test_x, train_y, test_y = train_test_split(feature, label, test_size=0.2)
+# 학습과 검증 데이터 분리 (학습 80%, 검증 20%)
+train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size=0.2)
+
+print('train dataset :', train_x.shape, train_y.shape)
+print('validation dataset :', val_x.shape, val_y.shape)
+print('test dataset :', test_x.shape, test_y.shape)
+
+history = model.fit(train_x, train_y,
+                    validation_data=(val_x, val_y),
+                    epochs=1000,
+                    callbacks=[early_stopping])
+
+import plotly.graph_objects as go
+
+fig = go.Figure( ) 
+fig.add_trace(go.Scattergl(y=history.history['loss'],name='loss')) 
+fig.add_trace(go.Scattergl(y=history.history['val_loss'],name='val_loss')) 
+fig.update_layout(title="<b>Loss of Model</b>", xaxis_title='Epoch', yaxis_title='Loss')
+fig.show( )
+
+x_test = [(91.1, 152.7)]
+#y_test = [39.1]
+
+print(model.predict(x_test))
+
+model.evaluate(test_x, test_y)
+
+

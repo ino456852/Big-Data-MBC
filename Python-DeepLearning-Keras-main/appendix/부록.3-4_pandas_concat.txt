@@ -1,0 +1,61 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+
+df = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/data/ds_salaries.csv')
+job_salary = df[["work_year", "job_title",  "salary_currency",  "salary", "salary_in_usd"]].copy()
+
+import pandas as pd
+
+# to_csv
+job_salary[job_salary["salary_currency"] == "USD"].to_csv('/content/drive/MyDrive/Colab Notebooks/data/job_usd_salary.csv')
+job_salary[job_salary["salary_currency"] == "EUR"].to_csv('/content/drive/MyDrive/Colab Notebooks/data/job_eur_salary.csv')
+job_salary[job_salary["salary_currency"] == "GBP"].to_csv('/content/drive/MyDrive/Colab Notebooks/data/job_gbp_salary.csv')
+
+# read_csv
+job_usd_salary = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/data/job_usd_salary.csv')
+job_eur_salary = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/data/job_eur_salary.csv')
+job_gbp_salary = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/data/job_gbp_salary.csv')
+
+# value_counts
+print (job_usd_salary['salary_currency'].value_counts() )
+print (job_eur_salary['salary_currency'].value_counts() )
+print (job_gbp_salary['salary_currency'].value_counts() )
+
+# pd.concat()
+concat_job_salary = pd.concat([job_usd_salary, job_eur_salary, job_gbp_salary], axis=0)
+
+print (concat_job_salary['salary_currency'].value_counts() )
+
+join_job_salary = df[["work_year", "job_title"]].drop_duplicates().copy()
+
+join_job_salary = join_job_salary[join_job_salary["job_title"] != "NaN"]
+
+join_job_salary.head()
+
+join_job_usd_salary = job_usd_salary[["work_year", "job_title", "salary"]].groupby(["work_year", "job_title"]).mean()
+
+# pd.merge
+leftjoin_job_salary = pd.merge(join_job_salary, join_job_usd_salary, how="left", on=["work_year", "job_title"])
+
+leftjoin_job_salary.head()
+
+# salary_in_usd
+leftjoin_job_salary = leftjoin_job_salary.rename(columns={"salary": "salary_in_usd"})
+
+leftjoin_job_salary.head()
+
+# salary_in_eur
+join_job_eur_salary = job_eur_salary[["work_year", "job_title", "salary"]].groupby(["work_year", "job_title"]).mean()
+leftjoin_job_salary = pd.merge(leftjoin_job_salary, join_job_eur_salary, how="left", on=["work_year", "job_title"])
+leftjoin_job_salary = leftjoin_job_salary.rename(columns={"salary": "salary_in_eur"})
+
+# salary_in_gbp
+join_job_gbp_salary = job_gbp_salary[["work_year", "job_title", "salary"]].groupby(["work_year", "job_title"]).mean()
+leftjoin_job_salary = pd.merge(leftjoin_job_salary, join_job_gbp_salary, how="left", on=["work_year", "job_title"])
+leftjoin_job_salary = leftjoin_job_salary.rename(columns={"salary": "salary_in_gbp"})
+
+leftjoin_job_salary.head()
+
+

@@ -1,0 +1,47 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+import tensorflow as keras
+
+from tensorflow.keras import datasets
+
+mnist = datasets.mnist
+(x_train, y_train),(x_test, y_test) = mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+
+print('\ntrain data:', x_train.shape, y_train.shape)
+print('test data:',x_test.shape, y_test.shape)
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Flatten, Dense
+
+model = Sequential([
+  Flatten(input_shape=(28, 28)),
+  Dense(128, activation='relu'),
+  Dense(10, activation='softmax')
+])
+
+model.summary()
+
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.fit(x_train, y_train, 
+          epochs=5)
+
+loss, accuracy = model.evaluate(x_test, y_test)
+
+print('\naccuracy :', accuracy)
+print('\loss :', accuracy)
+
+predictions = model.predict(x_test)
+
+print(predictions[0])
+
+import numpy as np
+
+print(np.argmax(predictions[0]))
+
+

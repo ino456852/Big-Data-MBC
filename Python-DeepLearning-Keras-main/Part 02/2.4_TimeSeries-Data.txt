@@ -1,0 +1,36 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+
+train_data = pd.read_csv("/content/drive/MyDrive/Colab Notebooks/data/Store Sales - Time Series Forecasting/train.csv")
+
+print(train_data.shape)
+train_data.head(10)
+
+train_data.query("store_nbr==1 and family == 'AUTOMOTIVE'").head(10)
+
+!pip install prophet
+
+import pandas as pd
+
+train_data = pd.read_csv("/content/drive/MyDrive/Colab Notebooks/data/Store Sales - Time Series Forecasting/train.csv")
+
+df = train_data.query("store_nbr==1 and family == 'AUTOMOTIVE'").copy()
+df = df[['date','sales']].copy()
+df.columns = ['ds', 'y']
+df['ds'] = pd.to_datetime(df['ds'])
+
+df.head()
+
+# Python
+from prophet import Prophet
+
+m = Prophet()
+m.fit(df)
+future = m.make_future_dataframe(periods=365)
+forecast = m.predict(future)
+
+fig2 = m.plot_components(forecast)
+
+

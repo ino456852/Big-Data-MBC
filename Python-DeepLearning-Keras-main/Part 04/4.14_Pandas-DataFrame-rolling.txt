@@ -1,0 +1,23 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+import numpy as np
+
+index = pd.date_range(start="2022-01-01", end="2022-01-05")
+data = np.array(range(5))
+
+df = pd.DataFrame(data=data, index=index, columns=["Close"])
+df.head()
+
+df.rolling(window=2).sum()
+
+df.rolling(window=3).sum()
+
+df.rolling(window=2, min_periods=1).sum()
+
+df.expanding().sum()
+
+df['Close'].ewm(span=2).mean()
+
+

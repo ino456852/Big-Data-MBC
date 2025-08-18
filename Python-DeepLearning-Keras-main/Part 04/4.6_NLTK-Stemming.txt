@@ -1,0 +1,29 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+!pip install --user -U nltk
+
+from nltk.stem import PorterStemmer
+
+stemmer = PorterStemmer()
+
+# 3인칭 단수 현재 plays 
+# 과거형 played 
+# 과거 분사 played 
+# 현재 분사 playing
+
+print(stemmer.stem('play'))
+print(stemmer.stem('plays'))
+print(stemmer.stem('played'))
+print(stemmer.stem('playing'))
+
+from nltk.stem import PorterStemmer
+
+stemmer = PorterStemmer()
+
+print(stemmer.stem('teach'))
+print(stemmer.stem('teaches'))
+print(stemmer.stem('teaching'))
+print(stemmer.stem('taught'))
+
+

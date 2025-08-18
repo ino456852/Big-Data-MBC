@@ -1,0 +1,31 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd 
+
+pd.date_range(start="2022-01-01", end="2022-01-31")
+
+pd.date_range("2022-01-01", periods=31, freq="D")
+
+pd.date_range(start="2022-01-01", periods=3, freq="Y")
+
+pd.date_range("2022-01-01", periods=12, freq="M") 
+
+pd.date_range("2022-01-01", periods=24, freq="h")
+
+pd.date_range("2022-01-01", periods=60, freq="T")
+
+pd.date_range("2022-01-01", periods=60, freq="s")
+
+day = pd.date_range("2022-01-01", "2022-01-09", freq="D").to_series() 
+
+day.dt.dayofweek
+
+day = pd.Series(pd.date_range("2022-02-27", periods=4)) 
+
+print(day, '\n')
+
+print(day.dt.is_month_start, '\n') 
+print(day.dt.is_month_end)
+
+

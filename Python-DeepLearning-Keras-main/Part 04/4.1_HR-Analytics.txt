@@ -1,0 +1,151 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+!pip install pandas-profiling==3.1.0
+
+#!pip install --upgrade pandas-profiling
+#!pip install markupsafe==2.0.1
+
+import pandas as pd
+import numpy as np
+import tensorflow as tf
+import tensorflow.keras as keras
+
+train = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/data/HR Analytics_ Job Change of Data Scientists/aug_train.csv')
+
+from sklearn.model_selection import train_test_split
+
+train, test = train_test_split(train, test_size=0.2, random_state=0)
+train, val = train_test_split(train, test_size=0.2, random_state=0)
+
+print('train & validation Dataset : ', train.shape, val.shape)
+print('test Dataset : ', test.shape)
+
+train.info()
+
+import pandas_profiling
+
+profile = train.profile_report()
+profile
+
+from tensorflow import feature_column
+
+feature_columns = []
+
+# 수치형 피처
+for numeric_col in ['enrollee_id', 'city_development_index', 'training_hours']:
+  feature_columns.append(feature_column.numeric_column(numeric_col))
+
+train['gender'].value_counts()
+
+## 범주형 피처
+gender = feature_column.categorical_column_with_vocabulary_list(
+      'gender', ['Male', 'Female', 'Other'])
+gender_one_hot = feature_column.indicator_column(gender)
+feature_columns.append(gender_one_hot)
+
+relevent_experience = feature_column.categorical_column_with_vocabulary_list(
+      'relevent_experience', ['Has relevent experience', 'No relevent experience'])
+relevent_experience_one_hot = feature_column.indicator_column(relevent_experience)
+feature_columns.append(relevent_experience_one_hot)
+
+enrolled_university = feature_column.categorical_column_with_vocabulary_list(
+      'enrolled_university', ['no_enrollment', 'Full time course', 'Part time course'])
+enrolled_university_one_hot = feature_column.indicator_column(enrolled_university)
+feature_columns.append(enrolled_university_one_hot)
+
+## 임베딩 피처
+education_level = feature_column.categorical_column_with_vocabulary_list(
+      'education_level', ['Graduate', 'High School', 'Masters', 'Primary School', 'Phd'])
+education_level_embedding = feature_column.embedding_column(education_level, dimension=10)
+
+feature_columns.append(education_level_embedding)
+
+# 임베딩 피처
+company_size = feature_column.categorical_column_with_vocabulary_list(
+      'company_size', ['50-99', '100-500', '10000+', '10/49', '1000-4999', '<10', '500-999', '5000-9999'])
+company_size_embedding = feature_column.embedding_column(company_size, dimension=10)
+
+feature_columns.append(company_size_embedding)
+
+train = train.dropna()
+val = val.dropna()
+test = test.dropna()
+
+def dataframe_to_dataset(dataframe, shuffle=True, batch_size=32):
+    dataframe = dataframe.copy()
+    labels = dataframe.pop('target')
+    ds = tf.data.Dataset.from_tensor_slices((dict(dataframe), labels))
+    if shuffle:
+        ds = ds.shuffle(buffer_size=len(dataframe))
+    ds = ds.batch(batch_size)
+    return ds
+
+batch_size = 32
+
+train_ds = dataframe_to_dataset(train, batch_size=batch_size)
+val_ds = dataframe_to_dataset(val, shuffle=False, batch_size=batch_size)
+test_ds = dataframe_to_dataset(test, shuffle=False, batch_size=batch_size)
+
+from tensorflow.keras.layers import DenseFeatures
+
+DenseFeatures_Layer = DenseFeatures(feature_columns)
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+model = Sequential([
+  DenseFeatures_Layer,
+  Dense(128, activation='relu'),
+  Dense(64, activation='relu'),
+  Dense(32, activation='relu'),
+  Dense(1, activation='sigmoid')
+])
+
+model.compile(optimizer='adam',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+
+early_stopping = EarlyStopping(patience = 10)
+checkpoint_model = ModelCheckpoint('ModelCheckpoint.h5')
+
+history = model.fit(train_ds,
+          validation_data=val_ds,
+          epochs=100,
+          callbacks=[early_stopping, checkpoint_model])
+
+loss, accuracy = model.evaluate(test_ds)
+print("accuracy: ", accuracy)
+
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+
+fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+# model history
+epoch = history.epoch
+
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+accuracy = history.history['accuracy']
+val_accuracy = history.history['val_accuracy']
+
+# Scatter
+fig.add_trace(go.Scatter(x=epoch, y=loss, name="loss"),secondary_y=False,)
+fig.add_trace(go.Scatter(x=epoch, y=val_loss, name="val_loss"),secondary_y=False,)
+fig.add_trace(go.Scatter(x=epoch, y=accuracy, name="accuracy"),secondary_y=True,)
+fig.add_trace(go.Scatter(x=epoch, y=val_accuracy, name="val_accuracy"),secondary_y=True,)
+
+# Templates configuration, Default template: 'plotly'
+# Available templates: ['ggplot2', 'seaborn', 'simple_white', 'plotly','plotly_white', 'plotly_dark', 'presentation', 'xgridoff','ygridoff', 'gridon', 'none']
+fig.update_layout(title_text="<b>Loss/Accuracy of Model</b>", template='plotly')
+
+fig.update_xaxes(title_text="Epoch")
+fig.update_yaxes(title_text="Loss", secondary_y=False)
+fig.update_yaxes(title_text="Accuracy", secondary_y=True)
+
+fig.show()
+
+

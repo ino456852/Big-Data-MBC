@@ -1,0 +1,149 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas_datareader.data as web
+
+data = web.DataReader('035420', 'naver', start='2011-01-01', end='2022-06-30')
+
+print(data.shape)
+data.tail()
+
+data.info()
+
+data = data.astype('int')
+
+data.info()
+
+# 데이터 분할
+train_df = data['2011-1':'2020-12'].copy()
+val_df = data['2021-1':'2021-12'].copy()
+test_df = data['2022-1':].copy()
+
+print('train_df.shape'  , train_df.shape)
+print('val_df.shape'    , val_df.shape)
+print('test_df.shape'   , test_df.shape)
+
+# 데이터 정규화(Normalization)
+train_max = train_df.max()
+train_min = train_df.min()
+
+train_df = (train_df - train_min) / (train_max - train_min)
+val_df = (val_df - train_min) / (train_max - train_min)
+test_df = (test_df - train_min) / (train_max - train_min)
+
+train_df.head()
+
+from tensorflow.keras.preprocessing import timeseries_dataset_from_array
+
+window_length = 7
+
+x_train = train_df.values
+y_train = train_df['Close'].iloc[window_length:]
+
+train_ds = timeseries_dataset_from_array(
+            x_train, y_train,
+            sequence_length=window_length,
+            batch_size=32
+)
+
+for batch in train_ds.take(1):
+    inputs, targets = batch
+
+print("Input shape:", inputs.numpy().shape)
+print("Target shape:", targets.numpy().shape)
+
+from tensorflow.keras.preprocessing import timeseries_dataset_from_array
+
+window_length = 7
+
+x_val = val_df.values
+y_val = val_df['Close'].iloc[window_length:]
+
+val_ds = timeseries_dataset_from_array(
+    x_val, y_val,
+    sequence_length=window_length,
+    batch_size=32
+)
+
+for batch in val_ds.take(1):
+    inputs, targets = batch
+
+print("Input shape:", inputs.numpy().shape)
+print("Target shape:", targets.numpy().shape)
+
+from tensorflow.keras import Model
+from tensorflow.keras.layers import Input, LSTM, Dense
+
+inputs = Input(shape=(7, 5))
+x = LSTM(32)(inputs)
+outputs = Dense(1)(x)
+
+model = Model(inputs=inputs, outputs=outputs)
+model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+
+model.summary()
+
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+
+earlyetopping_callback = EarlyStopping(monitor="val_loss", 
+                                       patience=10)
+
+modelcheckpoint_callback = ModelCheckpoint(filepath="best_checkpoint_model.h5", 
+                                           monitor="val_loss", 
+                                           save_weights_only=True, 
+                                           save_best_only=True, 
+                                           verbose=1)
+
+%%time
+
+history = model.fit(train_ds,
+    epochs=100,
+    validation_data=val_ds,
+    batch_size = 32,
+    callbacks=[earlyetopping_callback, modelcheckpoint_callback]
+)
+
+import plotly.graph_objects as go
+
+fig = go.Figure()
+fig.add_trace(go.Scattergl(y=history.history['loss'],name='loss'))
+fig.add_trace(go.Scattergl(y=history.history['val_loss'],name='val_loss'))
+fig.update_layout(title="<b>Loss of Model</b>", xaxis_title='Epoch',yaxis_title='Loss', template='seaborn')
+fig.show()
+
+model.load_weights('best_checkpoint_model.h5')
+
+from tensorflow.keras.preprocessing import timeseries_dataset_from_array
+
+window_length = 7
+
+x_test = test_df.values
+y_test = test_df['Close'].iloc[window_length:]
+
+test_ds = timeseries_dataset_from_array(
+    x_test, y_test,
+    sequence_length=window_length,
+    batch_size=32
+)
+
+for batch in test_ds.take(1):
+    inputs, targets = batch
+
+print("Input shape:", inputs.numpy().shape)
+print("Target shape:", targets.numpy().shape)
+
+test_numpy = test_df['Close'][7:].to_numpy()
+pred = model.predict(test_ds)
+
+print(test_numpy.shape)
+print(pred.shape)
+
+import plotly.graph_objects as go
+
+fig = go.Figure()
+fig.add_trace(go.Scattergl(y=test_numpy, name='actual'))
+fig.add_trace(go.Scattergl(y=pred.reshape(114,), name='prediction'))
+fig.update_layout(title="<b>네이버 주식 종가 예측</b>", xaxis_title='Date',yaxis_title='Close', template='seaborn')
+fig.show()
+
+

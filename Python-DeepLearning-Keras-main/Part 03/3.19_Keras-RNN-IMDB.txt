@@ -1,0 +1,102 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import datasets
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, GlobalAveragePooling1D, Dense 
+
+from sklearn.model_selection import train_test_split
+
+from tensorflow.keras import datasets
+
+(x_train, y_train), (x_test, y_test) = datasets.imdb.load_data(num_words=25000)
+
+print('\ntrain dataset :', x_train.shape, y_train.shape)
+print('test dataset :', x_test.shape, y_test.shape)
+
+print(x_train[0])
+
+len(x_train[0]), len(x_train[1])
+
+word_index = datasets.imdb.get_word_index()
+word_index
+
+import plotly.express as px
+
+review_len = [len(review) for review in x_train]
+
+fig = px.histogram(review_len)
+fig.show()
+
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+print( len(x_train[0]), len(x_train[1]) )
+
+x_train = pad_sequences(sequences=x_train, maxlen=256)
+x_test = pad_sequences(sequences=x_test, maxlen=256)
+
+print( len(x_train[0]), len(x_train[1]) )
+
+print(x_train[0])
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense 
+
+num_words = 25000
+
+model = Sequential()
+model.add(Embedding(input_dim=num_words, output_dim=16))
+model.add(LSTM(32, return_sequences=True))
+model.add(LSTM(32))
+model.add(Dense(16, activation='relu'))
+model.add(Dense(1, activation='sigmoid'))
+
+model.summary()
+
+model.compile(optimizer='adam',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+
+from sklearn.model_selection import train_test_split
+
+x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2)
+
+print('train dataset :', x_train.shape, y_train.shape)
+print('validation dataset :', x_val.shape, y_val.shape)
+
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+
+early_stopping = EarlyStopping(patience = 10)
+checkpoint_model = ModelCheckpoint('ModelCheckpoint.h5')
+
+history = model.fit(x_train, y_train,
+                    validation_data=(x_val, y_val),
+                    epochs=100,
+                    batch_size=256,
+                    callbacks=[early_stopping, checkpoint_model])
+
+model.evaluate(x_test,  y_test)
+
+history_dict = history.history
+history_dict.keys()
+
+import plotly.graph_objects as go
+
+fig = go.Figure()
+fig.add_trace(go.Scattergl(y=history.history['accuracy'], name='Train'))
+fig.add_trace(go.Scattergl(y=history.history['val_accuracy'], name='Valid'))
+fig.update_layout(height=500, width=700, title='Accuracy', xaxis_title='Epoch', yaxis_title='Accuracy')
+fig.show()
+
+import plotly.graph_objects as go
+
+fig = go.Figure()
+fig.add_trace(go.Scattergl(y=history.history['loss'],name='Train'))
+fig.add_trace(go.Scattergl(y=history.history['val_loss'],name='Valid'))
+fig.update_layout(height=500, width=700,title='Loss',xaxis_title='Epoch',yaxis_title='Loss')
+fig.show()
+
+

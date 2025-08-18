@@ -1,0 +1,51 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+from tensorflow import keras
+
+print('tensorflow version:', tf.__version__)
+print('keras version:', keras.__version__)
+
+from tensorflow.keras import datasets
+
+boston_housing = datasets.boston_housing
+(x_train, y_train),(x_test, y_test) = boston_housing.load_data()
+
+print('\ntrain data:', x_train.shape, y_train.shape)
+print('test data:',x_test.shape, y_test.shape)
+
+tf.random.set_seed(0)
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras import Input
+from tensorflow.keras.layers import Dense
+
+model = Sequential()
+
+model.add(Input(shape=(13,)))
+model.add(Dense(units=64, activation="relu"))
+model.add(Dense(units=64, activation="relu"))
+model.add(Dense(units=1))
+
+model.summary()
+
+model.compile(optimizer='RMSprop',
+              loss='mse',
+              metrics=['mae', 'mse'])
+
+model.fit(x_train, y_train, 
+          validation_split = 0.2,
+          epochs=5)
+
+loss, mae, mse = model.evaluate(x_test, y_test, verbose=2)
+
+print('\nloss :', loss)
+print('mae :', mae)
+print('mse :', mse)
+
+predictions = model.predict(x_test)
+
+print(predictions[:5])
+
+

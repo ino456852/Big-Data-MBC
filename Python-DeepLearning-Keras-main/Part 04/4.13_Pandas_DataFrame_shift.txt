@@ -1,0 +1,27 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+import numpy as np
+
+index = pd.date_range(start="2010-01-01", end="2021-12-31")
+data = np.random.randint(0, 100, size=(len(index), 5))
+
+df = pd.DataFrame(data=data, index=index, columns=["Open", "High", "Low", "Close", "Volume"])
+df.head()
+
+df.shift(periods=1).head()
+
+df.shift(periods=-1).tail()
+
+df.shift(periods=-1).head()
+
+df.shift(periods=2, fill_value=0).head()
+
+df.shift(periods=2, freq="D").head()
+
+df.tshift(periods=1, freq="D").head()
+
+df.tshift(periods=-1, freq="D").head()
+
+

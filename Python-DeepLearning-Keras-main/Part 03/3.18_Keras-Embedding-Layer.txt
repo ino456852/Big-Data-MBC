@@ -1,0 +1,32 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+from tensorflow.keras import Sequential, layers
+from tensorflow.keras.layers import Embedding
+
+import numpy as np
+
+input_array = np.random.randint(low=1, high=5, size=(2, 4))
+
+print("input_array.shape : ", input_array.shape)
+print(input_array)
+
+model = Sequential()
+model.add(layers.Embedding(input_dim=5, 
+                           output_dim=10, 
+                           input_length=4))
+
+model.compile(optimizer='adam', 
+              loss='mse') 
+
+model.summary()
+
+output_array = model.predict(input_array)
+
+print(input_array)
+
+print("output_array.shape : ", output_array.shape)
+print("\n", output_array)
+
+

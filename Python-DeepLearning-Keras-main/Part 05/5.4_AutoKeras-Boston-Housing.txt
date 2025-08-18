@@ -1,0 +1,38 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+# pip패키지로 오토케라스 설치
+
+!pip install autokeras
+
+# 라이브러리 로드
+import pandas as pd
+import numpy as np
+import tensorflow as tf
+import autokeras as ak
+
+from tensorflow.keras.datasets import boston_housing
+
+# 데이터셋 라이브러리 및 데이터 로드
+(X_train, y_train), (X_test, y_test) = boston_housing.load_data(test_split=0.2, seed=486)
+
+# 데이터 형태 출력
+print("\ntrain : ", X_train.shape,  y_train.shape)
+print("test : ", X_test.shape, y_test.shape)
+
+# 모델 생성
+reg = ak.StructuredDataRegressor(overwrite=True, max_trials=3, seed=486)
+
+# 모델 학습
+reg.fit(X_train, y_train, epochs=10)
+
+# 모델 예측
+predicted_y = reg.predict(X_test)
+
+# 상위 예측값 2건 출력
+print(predicted_y[:2])
+
+# 모델 평가
+print(reg.evaluate(X_test, y_test))
+
+

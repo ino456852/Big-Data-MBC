@@ -1,0 +1,23 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+from tensorflow import keras
+
+from tensorflow.keras.datasets import mnist
+
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+x_train.shape
+
+import numpy as  np
+np.set_printoptions(threshold=784, linewidth=np.inf)
+
+print(x_train[0])
+
+import matplotlib.pyplot as plt
+
+plt.imshow(x_train[0], cmap='Greys')
+plt.show()
+
+y_train[0]

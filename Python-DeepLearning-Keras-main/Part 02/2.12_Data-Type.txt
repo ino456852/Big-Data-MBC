@@ -1,0 +1,34 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+
+vector_float64 = tf.constant([183, 89, 26.58], dtype=tf.float64)
+
+print(vector_float64)
+
+import tensorflow as tf
+
+vector_float32 = tf.cast(vector_float64, dtype=tf.float32)
+vector_float16 = tf.cast(vector_float32, dtype=tf.float16)
+
+vector_uint8 = tf.cast(vector_float64, dtype=tf.uint8)
+
+print(vector_float32)
+print(vector_float16)
+print(vector_uint8)
+
+import numpy as np
+
+vector_float64 = np.array([183, 89, 26.58], dtype=np.float64)
+vector_float32 = vector_float64.astype('float32')
+vector_float16 = vector_float64.astype('float16')
+
+vector_uint8 = vector_float64.astype('uint8')
+
+print(vector_float64, vector_float64.dtype, type(vector_float64))
+print(vector_float32, vector_float32.dtype, type(vector_float64))
+print(vector_float16, vector_float16.dtype, type(vector_float64))
+print(vector_uint8, vector_uint8.dtype, type(vector_float64))
+
+

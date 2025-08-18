@@ -1,0 +1,14 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+
+train_data = pd.read_csv("/content/drive/MyDrive/Colab Notebooks/data/Real or Not? NLP with Disaster Tweets!/train.csv")
+
+print(train_data.shape)
+
+train_data.head(100)
+
+train_data['target'].value_counts()
+
+

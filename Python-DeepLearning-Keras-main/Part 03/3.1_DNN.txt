@@ -1,0 +1,36 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+import tensorflow as keras
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dense
+
+# 케라스로 선형회귀 모델 생성
+x = Input(shape=(2,)) #키, 몸무게
+y = Dense(units=1)(x)
+
+model = Model(x, y)
+
+model.compile(loss='mae',
+              optimizer='adam',
+              metrics=['mae','mse'])
+
+model.summary()
+
+feature = [(97.1, 160.2), (98.8, 182.3), (74.3, 184.2), (103.7, 185.3), (83.3, 177.1)]
+label = [37.8, 29.7, 21.9, 30.2, 26.6]
+
+model.fit(feature, label, epochs=1000)
+
+feature_test = [(91.1, 152.7), (72.6, 158.4), (73.0, 161.2), (81.4, 161.3), (86.0, 167.8)]
+label_test = [39.1, 28.9, 28.1, 31.3, 30.5]
+
+model.evaluate(feature_test, label_test)
+
+x_test = [(91.1, 152.7)]
+#y_test = [39.1]
+
+print(model.predict(x_test))
+
+

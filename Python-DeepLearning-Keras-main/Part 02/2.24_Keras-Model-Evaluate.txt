@@ -1,0 +1,68 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+from tensorflow.keras import datasets
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Flatten, Dense
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+
+mnist = datasets.mnist
+(x_train, y_train),(x_test, y_test) = mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+
+model = Sequential([
+  Flatten(input_shape=(28,28)),
+  Dense(32, activation='relu'),
+  Dense(16, activation='relu'),
+  Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+callback_EarlyStopping = EarlyStopping(monitor='val_loss', patience=5, verbose=1)
+callback_ModelCheckpoint = ModelCheckpoint(filepath='./ModelCheckpoint', monitor='val_loss', save_weights_only=True, save_best_only=True, verbose=1)
+
+history = model.fit(x_train, y_train,
+                    validation_split=0.2,
+                    epochs=20, 
+                    batch_size=32,
+                    callbacks=[callback_EarlyStopping, callback_ModelCheckpoint])
+
+loss, accuracy = model.evaluate(x_test, y_test)
+
+print('\nTest accuracy:', accuracy)
+print('Test loss:', loss)
+
+import tensorflow as tf
+
+test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test))
+test_ds = test_ds.batch(32)
+
+result = model.evaluate(test_ds)
+
+print('\nTest accuracy:', accuracy)
+print('Test loss:', loss)
+
+predictions = model.predict(x_test)
+
+print(predictions[0])
+print(predictions[1])
+
+import numpy as np
+
+print(np.argmax(predictions[0]))
+print(np.argmax(predictions[1]))
+
+import matplotlib.pyplot as plt
+
+plt.imshow(x_test[0], cmap='Greys')
+plt.show()
+
+import matplotlib.pyplot as plt
+
+plt.imshow(x_test[1], cmap='Greys')
+plt.show()
+
+

@@ -1,0 +1,417 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+
+file_path = '/content/drive/MyDrive/Colab Notebooks/data/Spam Text Message Classification/SPAM text message 20170820 - Data.csv'
+df = pd.read_csv(file_path)
+
+df.head()
+
+# 1. 기초적인 통계정보 확인 (데이터의 형상 및 데이터 타입 등)
+
+df.shape
+
+df.info()
+
+df.describe()
+
+# 2. 긍정, 부정 데이터의 분포
+
+df['Category'].value_counts()
+
+import plotly.express as px
+
+fig = px.bar(df['Category'].value_counts(),
+             width=500,
+             height=300)
+fig.show()
+
+# 3. 각 리뷰의 문자 길이 분포 (문자길이)
+
+print( df['Message'][1] )
+print( len(df['Message'][1]) )
+
+print( df['Message'][2], '\n' )
+
+print( len(df['Message'][2]) )
+
+import numpy as np
+
+message_lenght = df['Message'].astype(str).apply(len)
+
+print('최대 값: {}'.format(np.max(message_lenght)))
+print('최소 값: {}'.format(np.min(message_lenght)))
+print('평균 값: {:.2f}'.format(np.mean(message_lenght)))
+print('표준편차: {:.2f}'.format(np.std(message_lenght)))
+print('중간 값: {}'.format(np.median(message_lenght)))
+
+print('25 백분위수: {}'.format(np.percentile(message_lenght, 25)))
+print('50 백분위수: {}'.format(np.percentile(message_lenght, 50)))
+print('75 백분위수: {}'.format(np.percentile(message_lenght, 75)))
+
+import plotly.express as px
+
+message_lenght = df['Message'].astype(str).apply(len)
+
+fig = px.histogram(message_lenght)
+fig.show()
+
+# 4. 각 리뷰의 단어 개수 분포 (단어개수))
+
+word_count = df['Message'].astype(str).apply(lambda x:len(x.split(' ')))
+
+print('최대 값: {}'.format(np.max(word_count)))
+print('최소 값: {}'.format(np.min(word_count)))
+print('평균 값: {:.2f}'.format(np.mean(word_count)))
+print('표준편차: {:.2f}'.format(np.std(word_count)))
+print('중간 값: {}'.format(np.median(word_count)))
+
+print('25 백분위수: {}'.format(np.percentile(word_count, 25)))
+print('50 백분위수: {}'.format(np.percentile(word_count, 50)))
+print('75 백분위수: {}'.format(np.percentile(word_count, 75)))
+
+import plotly.express as px
+
+word_count = df['Message'].astype(str).apply(lambda x:len(x.split(' ')))
+
+fig = px.histogram(word_count)
+fig.show()
+
+# 5. 특수문자 및 대문자, 소문자 비율
+
+# 물음표가 구두점으로 쓰임
+qmarks = np.mean(df['Message'].apply(lambda x: '?' in x)) 
+# 마침표
+fullstop = np.mean(df['Message'].apply(lambda x: '.' in x))
+#  첫번째 대문자
+capital_first = np.mean(df['Message'].apply(lambda x: x[0].isupper())) 
+# 대문자가 몇개
+capitals = np.mean(df['Message'].apply(lambda x: max([y.isupper() for y in x])))
+# 숫자가 몇개
+numbers = np.mean(df['Message'].apply(lambda x: max([y.isdigit() for y in x])))
+                  
+print('물음표가있는 질문: {:.2f}%'.format(qmarks * 100))
+print('마침표가 있는 질문: {:.2f}%'.format(fullstop * 100))
+print('첫 글자가 대문자 인 질문: {:.2f}%'.format(capital_first * 100))
+print('대문자가있는 질문: {:.2f}%'.format(capitals * 100))
+print('숫자가있는 질문: {:.2f}%'.format(numbers * 100))
+
+#6. 많이 사용된 단어
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
+cloud = WordCloud(width=800, height=600).generate(" ".join(df['Message']))
+plt.figure(figsize=(20, 15))
+plt.imshow(cloud)
+plt.axis('off')
+
+#1. 데이터 정재(Cleaning)
+
+df['Message'][2]
+
+import re
+
+# 영어와 한글이 아닌 문자는 공백으로 변환
+message_text = re.sub('[^a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]', ' ', df['Message'][2]) 
+print(message_text)
+
+# 소문자 변환
+print('대문자가있는 질문: {:.2f}%'.format(capitals * 100))
+
+message_lower_text = message_text.lower().split()
+
+print(message_lower_text)
+
+# 3. 불용어(Stopword) 제거
+import nltk
+from nltk.corpus import stopwords
+
+nltk.download('stopwords')
+
+stopwords = stopwords.words('english')
+
+print('\n', stopwords)
+print('\n', len(stopwords))
+
+print( message_lower_text )
+
+print([word for word in message_lower_text if word not in stopwords])
+
+# 5. 정규화(Normalization) : 어간추출
+
+from nltk.stem import PorterStemmer
+
+stemmer = nltk.stem.PorterStemmer()
+
+message_lower_stemmer_text = [stemmer.stem(w) for w in message_lower_text]
+
+print(message_lower_text, '\n')
+print(message_lower_stemmer_text)
+
+# 2~5 과정 데이터 전처리
+
+def message_to_words( raw_message ):
+    # 1. HTML 제거
+    #raw_message = BeautifulSoup(raw_message, 'html.parser').get_text()
+    
+    # 2. 영문자가 아닌 문자는 공백으로 치환
+    #letters_only = re.sub('[^a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]', ' ', raw_message)
+    letters_only = re.sub('[^a-zA-Z]', ' ', raw_message)
+    
+    # 3. 소문자 변환
+    words = letters_only.lower().split()
+    
+    # 4. Stopwords 불용어 제거
+    meaningful_words = [w for w in words if not w in stopwords]
+    
+    # 5. 어간추출
+    stemming_words = [stemmer.stem(w) for w in meaningful_words]
+    
+    # 6. 공백으로 구분된 문자열로 결합하여 결과를 반환
+    return( ' '.join(stemming_words) )
+
+clean_message = message_to_words(df['Message'][2])
+
+print(len(df['Message'][2]))
+print(df['Message'][2], '\n')
+print(len(clean_message))
+print(clean_message)
+
+# 참고 : https://gist.github.com/yong27/7869662
+# http://www.racketracer.com/2016/07/06/pandas-in-parallel/
+
+from multiprocessing import Pool
+
+def _apply_df(args):
+    df, func, kwargs = args
+    return df.apply(func, **kwargs)
+
+def apply_by_multiprocessing(df, func, **kwargs):
+    # 키워드 항목 중 workers 파라메터를 꺼냄
+    workers = kwargs.pop('workers')
+    # 위에서 가져온 workers 수로 프로세스 풀을 정의
+    pool = Pool(processes=workers)
+    # 실행할 함수와 데이터프레임을 워커의 수 만큼 나눠 작업
+    result = pool.map(_apply_df, [(d, func, kwargs)
+            for d in np.array_split(df, workers)])
+    pool.close()
+    # 작업 결과를 합쳐서 반환
+    return pd.concat(list(result))
+
+clean_train_message = apply_by_multiprocessing(df['Message'], message_to_words, workers=4)
+
+df['Message_clean'] = clean_train_message
+
+df
+
+message_lenght = df['Message'].astype(str).apply(len)
+message_clean_len = df['Message_clean'].astype(str).apply(len)
+
+print('Message')
+print('최대 값: {}'.format(np.max(message_lenght)))
+print('최소 값: {}'.format(np.min(message_lenght)))
+print('평균 값: {:.2f}'.format(np.mean(message_lenght)))
+print('표준편차: {:.2f}'.format(np.std(message_lenght)))
+print('중간 값: {}'.format(np.median(message_lenght)), '\n')
+
+print('Message_clean')
+print('최대 값: {}'.format(np.max(message_clean_len)))
+print('최소 값: {}'.format(np.min(message_clean_len)))
+print('평균 값: {:.2f}'.format(np.mean(message_clean_len)))
+print('표준편차: {:.2f}'.format(np.std(message_clean_len)))
+print('중간 값: {}'.format(np.median(message_clean_len)))
+
+from wordcloud import WordCloud
+
+cloud = WordCloud(width=800, height=600).generate(" ".join(df['Message_clean']))
+
+plt.figure(figsize=(20, 15))
+plt.imshow(cloud)
+plt.axis('off')
+
+# 데이터 분리 및 기본적인 데이터 전처리
+
+df['Category'] = df['Category'].replace(['ham','spam'],[0,1])
+
+print(df.shape)
+
+df.drop_duplicates(subset=['Message_clean'], inplace=True)
+
+print(df.shape)
+
+df.sort_values(by='Message_clean' ,ascending=True)
+
+df = df.drop(253)
+df.sort_values(by='Message_clean' ,ascending=True)
+
+from sklearn.model_selection import train_test_split
+
+X_data = df['Message_clean']
+y_data = df['Category']
+
+X_train, X_test, y_train, y_test = train_test_split(X_data, y_data, 
+                                                    test_size=0.2, 
+                                                    random_state=0,
+                                                    shuffle=None)
+
+print(X_train.shape, y_train.shape)
+
+print(X_test.shape, y_test.shape)
+
+# 토근화(Tokenization)
+
+from tensorflow.keras.preprocessing.text import Tokenizer
+
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(X_train)
+
+X_train_tokenizer = tokenizer.texts_to_sequences(X_train)
+
+print(X_train[2:3])
+print(X_train_tokenizer[2])
+
+index_to_word = tokenizer.index_word
+
+print(index_to_word[631])
+print(index_to_word[313])
+
+print( tokenizer.index_word )
+
+# 패딩 (Padding) 처리
+
+X_train_tokenizer[0:3]
+
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+max_len = 11
+X_train_padded = pad_sequences(X_train_tokenizer[0:3], maxlen = max_len)
+X_train_padded
+
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+# message 최대 값: 412
+# message 평균 값: 45.11
+
+max_len = 200
+X_train_padded = pad_sequences(X_train_tokenizer, maxlen = max_len)
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import SimpleRNN, Embedding, Dense
+
+vocab_size = len(index_to_word) + 1
+embedding_dim = 32
+hidden_units = 32
+
+model = Sequential()
+model.add(Embedding(vocab_size, embedding_dim))
+model.add(SimpleRNN(hidden_units))
+model.add(Dense(1, activation='sigmoid'))
+
+model.compile(optimizer='rmsprop', 
+              loss='binary_crossentropy', 
+              metrics=['accuracy'])
+
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+
+earlyetopping_callback = EarlyStopping(monitor="val_loss", 
+  patience=10)
+
+modelcheckpoint_callback = ModelCheckpoint(
+  filepath="best_checkpoint_model.h5",
+  monitor="val_loss",
+  save_weights_only=True,
+  save_best_only=True,
+  verbose=1)
+
+%%time
+history = model.fit(X_train_padded, y_train,
+  validation_split=0.2,
+  epochs=50, 
+  batch_size=64,
+  callbacks=[earlyetopping_callback, modelcheckpoint_callback])
+
+X_test_tokenizer = tokenizer.texts_to_sequences(X_test)
+X_test_padded = pad_sequences(X_test_tokenizer, maxlen = max_len)
+
+print("\n테스트 정확도: %.4f" % (model.evaluate(X_test_padded, y_test)[1]))
+
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+
+fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+# model history
+epoch = history.epoch
+
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+accuracy = history.history['accuracy']
+val_accuracy = history.history['val_accuracy']
+
+# Scatter
+fig.add_trace(go.Scatter(x=epoch, y=loss, name="loss"),secondary_y=False,)
+fig.add_trace(go.Scatter(x=epoch, y=val_loss, name="val_loss"),secondary_y=False,)
+fig.add_trace(go.Scatter(x=epoch, y=accuracy, name="accuracy"),secondary_y=True,)
+fig.add_trace(go.Scatter(x=epoch, y=val_accuracy, name="val_accuracy"),secondary_y=True,)
+
+# Templates configuration, Default template: 'plotly'
+# Available templates: ['ggplot2', 'seaborn', 'simple_white', 'plotly','plotly_white', 'plotly_dark', 'presentation', 'xgridoff','ygridoff', 'gridon', 'none']
+fig.update_layout(title_text="<b>Loss/Accuracy of Model</b>", template='plotly')
+
+fig.update_xaxes(title_text="Epoch")
+fig.update_yaxes(title_text="Loss", secondary_y=False)
+fig.update_yaxes(title_text="Accuracy", secondary_y=True)
+fig.show()
+
+%%time
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Embedding, Dense
+
+vocab_size = len(index_to_word) + 1
+embedding_dim = 32
+hidden_units = 32
+
+lstm_model = Sequential()
+lstm_model.add(Embedding(vocab_size, embedding_dim))
+lstm_model.add(LSTM(hidden_units))
+lstm_model.add(Dense(1, activation='sigmoid'))
+
+lstm_model.compile(optimizer='rmsprop', 
+              loss='binary_crossentropy', 
+              metrics=['accuracy'])
+
+history = lstm_model.fit(X_train_padded, y_train,
+  validation_split=0.2,
+  epochs=50, 
+  batch_size=32,
+  callbacks=[earlyetopping_callback, modelcheckpoint_callback])
+
+print("\n테스트 정확도: %.4f" % (lstm_model.evaluate(X_test_padded, y_test)[1]))
+
+%%time
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import GRU, Embedding, Dense
+
+vocab_size = len(index_to_word) + 1
+embedding_dim = 32
+hidden_units = 32
+
+gru_model = Sequential()
+gru_model.add(Embedding(vocab_size, embedding_dim))
+gru_model.add(GRU(hidden_units))
+gru_model.add(Dense(1, activation='sigmoid'))
+
+gru_model.compile(optimizer='rmsprop', 
+              loss='binary_crossentropy', 
+              metrics=['accuracy'])
+
+history = gru_model.fit(X_train_padded, y_train,
+  validation_split=0.2,
+  epochs=50, 
+  batch_size=32,
+  callbacks=[earlyetopping_callback, modelcheckpoint_callback])
+
+print("\n테스트 정확도: %.4f" % (gru_model.evaluate(X_test_padded, y_test)[1]))
+
+

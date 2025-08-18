@@ -1,0 +1,14 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+
+vector = tf.constant([183, 89, 26.58])
+print(vector)
+
+vector_numpy = vector.numpy()
+
+print(vector_numpy)
+type(vector_numpy)
+
+

@@ -1,0 +1,163 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import tensorflow as tf
+from tensorflow import keras
+
+from tensorflow.keras import Input
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+import pandas as pd
+
+URL = 'https://storage.googleapis.com/tf-datasets/titanic/train.csv'
+df = pd.read_csv(URL)
+
+type(df)
+
+print(df.shape)
+
+df.head()
+
+import tensorflow_datasets as tfds
+
+tfds.list_builders()[:5]
+
+import tensorflow_datasets as tfds
+
+ds, info = tfds.load('titanic', split='train', with_info=True)
+
+type(ds)
+
+info
+
+tfds.as_dataframe(ds.take(4), info)
+
+import pandas as pd
+
+url = 'https://storage.googleapis.com/tf-datasets/titanic/train.csv'
+df = pd.read_csv(url)
+
+df.info()
+
+import missingno
+
+missingno.matrix(df)
+
+from sklearn.preprocessing import LabelEncoder
+
+le = LabelEncoder()
+le = df[['sex', 'class', 'deck', 'embark_town','alone']].apply(le.fit_transform)
+
+df['sex'] = le['sex']
+df['class'] = le['class']
+df['deck'] = le['deck']
+df['embark_town'] = le['embark_town']
+df['alone'] = le['alone']
+
+df.head()
+
+df_y = df.pop('survived')
+df_x = df.loc[:,['age','fare']].copy()
+
+df_y
+
+df_x.T
+
+from sklearn.model_selection import train_test_split
+
+x_train, x_test, y_train, y_test = train_test_split(df_x, df_y, test_size=0.2)
+
+print('train dataset :', x_train.shape, y_train.shape)
+print('test dataset :', x_test.shape, y_test.shape)
+
+model = keras.Sequential()
+model.add(Input(shape=(2,)))
+model.add(Dense(32, activation="relu"))
+model.add(Dense(16, activation="relu"))
+model.add(Dense(1, activation="sigmoid"))
+
+model.summary()
+
+model.compile(loss='binary_crossentropy',
+              optimizer='adam',
+              metrics=['accuracy'])
+
+history = model.fit(x_train, y_train,
+          validation_split=0.2,
+          batch_size = 1, # 기본값 32
+          epochs=5)
+
+loss, accuracy = model.evaluate(x_test, y_test)
+
+print('test accuracy :', accuracy)
+
+from sklearn.model_selection import train_test_split
+
+df_x = df.copy()
+df_y = df_y.copy()
+
+x_train, x_test, y_train, y_test = train_test_split(df_x, df_y, test_size=0.2)
+
+print('train dataset :', x_train.shape, y_train.shape)
+print('test dataset :', x_test.shape, y_test.shape)
+
+from tensorflow.keras.callbacks import EarlyStopping
+
+model = keras.Sequential()
+model.add(Input(shape=(9,)))
+model.add(Dense(32, activation="relu"))
+model.add(Dense(16, activation="relu"))
+model.add(Dense(1, activation="sigmoid"))
+
+model.compile(loss='binary_crossentropy',
+              optimizer='adam',
+              metrics=['accuracy'])
+
+callback_EarlyStopping = EarlyStopping(monitor='val_loss', patience=5, verbose=1)
+
+history = model.fit(x_train, y_train,
+          validation_split=0.2,
+          batch_size = 16, # 기본값 32
+          epochs=100,
+          callbacks=callback_EarlyStopping)
+
+loss, accuracy = model.evaluate(x_test, y_test)
+
+print('test accuracy :', accuracy)
+
+predictions = model.predict(x_test)
+
+predictions[0:5]
+
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+
+fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+# model history
+epoch = history.epoch
+
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+accuracy = history.history['accuracy']
+val_accuracy = history.history['val_accuracy']
+
+# Scatter
+fig.add_trace(go.Scatter(x=epoch, y=loss, name="loss"),secondary_y=False,)
+fig.add_trace(go.Scatter(x=epoch, y=val_loss, name="val_loss"),secondary_y=False,)
+fig.add_trace(go.Scatter(x=epoch, y=accuracy, name="accuracy"),secondary_y=True,)
+fig.add_trace(go.Scatter(x=epoch, y=val_accuracy, name="val_accuracy"),secondary_y=True,)
+
+# Templates configuration, Default template: 'plotly'
+# Available templates: ['ggplot2', 'seaborn', 'simple_white', 'plotly','plotly_white', 
+#                       'plotly_dark', 'presentation', 'xgridoff','ygridoff', 'gridon', 'none']
+fig.update_layout(title_text="<b>Loss/Accuracy of Model</b>", template='plotly')
+
+fig.update_xaxes(title_text="Epoch")
+fig.update_yaxes(title_text="Loss", secondary_y=False)
+fig.update_yaxes(title_text="Accuracy", secondary_y=True)
+
+fig.show()
+
+

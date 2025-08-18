@@ -1,0 +1,73 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import pandas as pd
+
+data = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/data/NHANES Weight and Height/data.csv')
+
+feature_cols = ['Weight (kg)', 'Standing Height (cm)']
+
+label = data.pop('BMI(kg/m**2)')
+feature = data[feature_cols].copy()
+
+print(type(feature))
+print(type(label))
+
+feature.head()
+
+from sklearn.model_selection import train_test_split
+
+train_x, test_x, train_y, test_y = train_test_split(feature, label, test_size=0.2)
+
+print('train dataset :', train_x.shape, train_y.shape)
+print('test dataset :', test_x.shape, test_y.shape)
+
+from keras.callbacks import LambdaCallback
+
+weights_dict = {}
+weight_callback = LambdaCallback \
+(on_epoch_end=lambda epoch, logs: weights_dict.update({epoch:model.get_weights()}))
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+# 모델 생성 
+model = Sequential([
+    Dense(units=64, activation='relu', input_shape=[2]),
+    Dense(units=32, activation='relu'),
+    Dense(units=16, activation='relu'),
+    Dense(units=1) # activation='linear'
+])
+
+# 모델 컴파일 
+model.compile(loss='mae',
+              optimizer='adam',
+              metrics=['mae', 'mse'])
+
+# 모델 학습
+history = model.fit(train_x, train_y, 
+          epochs=200,
+          callbacks=[weight_callback])
+
+model.evaluate(test_x, test_y)
+
+for epoch,weights in weights_dict.items():
+    print("=========================================")
+    print("Weights for 1nd Layer of epoch #",epoch+1)
+    print(weights[0])
+    print("Bias for 1nd Layer of epoch #",epoch+1)
+    print(weights[1])
+    print("Weights for 2nd Layer of epoch #",epoch+1)
+    print(weights[2])
+    print("Bias for 2nd Layer of epoch #",epoch+1)
+    print(weights[3])
+
+import plotly.graph_objects as go
+
+fig = go.Figure( )
+fig.add_trace(go.Scattergl(y=history.history['loss'],name='loss')) 
+fig.update_layout(title="<b>Loss of Model</b>", xaxis_title='Epoch',yaxis_title='Loss', template='ggplot2')
+fig.show( )
+
+

@@ -1,0 +1,61 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+!pip install keras_tuner
+
+import tensorflow as tf
+from tensorflow.keras import datasets
+
+import keras_tuner as kt
+
+mnist = datasets.mnist
+(x_train, y_train),(x_test, y_test) = mnist.load_data()
+x_train, x_test = x_train / 255.0, x_test / 255.0
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Flatten, Dense
+from tensorflow.keras.optimizers import Adam
+
+def get_model(hp):
+    hp_unit = hp.Int('units', min_value = 16, max_value = 512, step = 16)
+    hp_lr = hp.Choice('learning_rate', values = [1e-2, 1e-3, 1e-4])
+
+    model = Sequential()
+    model.add(Flatten(input_shape=(28, 28)))
+    model.add(Dense(hp_unit, activation='relu'))
+    model.add(Dense(hp_unit, activation='relu'))
+    model.add(Dense(10, activation='softmax'))
+    model.compile(optimizer = Adam(learning_rate = hp_lr),
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'],
+    )
+    return model
+
+kerastuner = kt.Hyperband(get_model,
+                          directory = 'my_dir',
+                          objective = 'val_accuracy', 
+                          max_epochs = 5,
+                          factor = 3,
+                          project_name = 'kerastuner-mnist')
+
+kerastuner.search(x_train, y_train, 
+                  validation_data = (x_test, y_test),
+                  epochs = 5)
+
+best_hps = kerastuner.get_best_hyperparameters(num_trials = 1)[0]
+
+print ('best parameter - units : ', best_hps.get('units'))
+print ('best parameter - learning_rate : ', best_hps.get('learning_rate'))
+
+model = kerastuner.hypermodel.build(best_hps)
+
+history = model.fit(x_train, y_train, 
+                    validation_split=0.2,
+                    epochs = 5)
+
+loss, accuracy = model.evaluate(x_test, y_test)
+
+print('\naccuracy:', accuracy)
+print('loss:', loss)
+
+

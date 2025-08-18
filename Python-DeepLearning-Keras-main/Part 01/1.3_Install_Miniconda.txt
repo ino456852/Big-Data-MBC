@@ -1,0 +1,23 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+# terminal on Linux or macOS
+conda install anaconda-clean
+
+# terminal on window
+anaconda-clean --yes
+
+# Miniconda 공식 사이트에서 OS 환경에 맞는 파일을 다운로드 합니다.
+# .sh, .pkg, .exe 확장자
+
+sh Miniconda3-py38_4.10.1-MacOSX-arm64.sh
+
+# 자신의 OS에 맞는 pkg, exe 설치파일을 다운로드 받아 설치할수도 있습니다.
+
+du -sh opt/miniconda/*
+
+conda list
+
+conda list | grep tensorflow
+
+

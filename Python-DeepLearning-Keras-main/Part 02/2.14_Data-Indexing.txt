@@ -1,0 +1,24 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+import numpy as np
+
+array = np.arange(10)
+
+print('array :', array)
+
+print('\narray[0] :', array[0])
+print('array[-1] :', array[-1])
+
+import numpy as np
+
+array_25 = np.reshape(array,(2,5))
+
+print(array_25)
+
+print('\n array_25[0] :', array_25[0])
+print('array_25[1] :', array_25[1])
+
+print('array_25[2] :', array_25[2])
+
+
